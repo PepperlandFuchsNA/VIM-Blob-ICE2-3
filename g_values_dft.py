@@ -3,13 +3,17 @@
 
 import numpy as np
 import pandas as pd
-from scipy.fft import fft
+from scipy.fft import fft, fftfreq
 import os
 
 import matplotlib.pyplot as plt
+duration = 0.5         # Duration in seconds
+
+sampling_rate = 2000  # Sampling rate in Hz
+t = np.linspace(0, duration, int(sampling_rate * duration), endpoint=False) #added time vector for consitency
 
 # Load the CSV file
-file_path = 'g_values_slow_fan.xlsx'
+file_path = 'g_values_fast_fan.xlsx'
 file_extension = os.path.splitext(file_path)[1]
 
 if file_extension == '.csv':
@@ -24,22 +28,25 @@ actual_g = data.iloc[:1000, 0]
 # Find the mean of the points and shift to zero
 mean_value = actual_g.mean()
 actual_g = actual_g - mean_value
+
 # Plot the actual_g values
 plt.figure()
 plt.plot(actual_g)
-plt.title('Actual G Values')
+plt.title('Actual G Values for fast fan')
 plt.xlabel('Sample')
 plt.ylabel('Actual G')
 plt.grid(True)
 plt.show()
 
 # Convert actual_g to a NumPy array and compute the FFT
-fft_values = fft(actual_g.to_numpy())
-
+fft_values = fft(actual_g.to_numpy()) #changed to numpy array
+xf = fftfreq(len(t), 1 / sampling_rate) #added time vector for consitency
 # Plot the FFT
 plt.figure()
-plt.plot(np.abs(fft_values))
-plt.title('FFT of Actual G Values')
+idx = xf >= 0
+plt.plot(xf[idx], np.abs(fft_values)[idx]) #plotting only the positive frequencies
+
+plt.title('FFT of Actual G Values for fast fan')
 plt.xlabel('Frequency')
 plt.ylabel('Magnitude')
 plt.grid(True)
