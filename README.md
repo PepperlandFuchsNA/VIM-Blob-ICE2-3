@@ -1,6 +1,10 @@
 # VIM-Blob-ICE2-3
 Starter code and Guide to acquire raw g values from VIM32PP-E7DC8-0RE-IO-1V1401 using Blob connected to ICE2/3 IO-link master and Modbus TCP
 
+The settings for Blob being used for these runs are below.
+
+![image](https://github.com/user-attachments/assets/52520290-51f8-4dbf-b86a-061ab18c45dc)
+
 Results:
 Few runs were made with VIM connected to a desktop fan. 
 One with speed being very high
