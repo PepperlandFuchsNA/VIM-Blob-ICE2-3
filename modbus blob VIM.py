@@ -167,7 +167,7 @@ if __name__ == "__main__":
     print(blob_id_response["blob_id"])
 
     Blob_data_capture(port_number)
-    while Blob_data_capture(4) != 0:
+    while Blob_data_capture(port_number) != 0:
         Blob_data_capture(port_number)
         #print(f'status is  {Get_Blob_pdi_status(4)}') 
 
