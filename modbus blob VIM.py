@@ -134,7 +134,81 @@ def Blob_data_parser(data):
             for g_value in actual_g_values:
                 writer.writerow([g_value, counter])
         pass
+def blob_config(port_number,ssc_trigger=0, raw_data_sampling_rate=5, raw_data_memmory_size=10):
 
+    write_register = port_number*1000 + 300
+    read_register = port_number*1000 + 100
+    # 0:Inactive
+    # 1:SSC1.1 - vRMS
+    # 2:SSC1.2 - vRMS
+    # 3:SSC2.1 - aRMS
+    # 4:SSC2.2 - aRMS
+    # 5:SSC3.1 - aPeak
+    # 6:SSC3.2 - aPeak
+    # 7:SSC4.1 - Temperature
+    # 8:SSC4.2 - Temperature
+    # 9:SSC5.1 - Crest
+    # 10:SSC5.2 - Crest
+    # 11:SSC6.1 - Bearing Condition
+    # 12:SSC6.2 - Bearing Condition
+    client.write_multiple_register(write_register, [2, 101, 0, 1, int(f"0x{ssc_trigger:02x}00", 16)])
+    client.write_multiple_register(write_register, [2, 101, 0, 1, int(f"0x{ssc_trigger:02x}00", 16)])
+    time.sleep(1)
+    client.write_multiple_register(write_register, [1, 101, 0, 1])
+    client.write_multiple_register(write_register, [1, 101, 0, 1])
+    time.sleep(1)
+    response = client.read_register(read_register, 6)
+    ssc_trigger_status = (response[4] >> 8) & 0xFF
+    print(f'SSC trigger is set to {ssc_trigger_status}')
+
+    # 0:64 kHz sampling rate, 12 kHz low-pass
+    # 1:32 kHz sampling rate, 6 kHz low-pass
+    # 2:16 kHz sampling rate, 3 kHz low-pass
+    # 3:8 kHz sampling rate, 1.5 kHz low-pass
+    # 4:4 kHz sampling rate, 0.75 kHz low-pass
+    # 5:2 kHz sampling rate, 0.3 kHz low-pass
+    
+  
+    client.write_multiple_register(write_register, [2, 97, 0, 1, int(f"0x{raw_data_sampling_rate:02x}00", 16)])
+    client.write_multiple_register(write_register, [2, 97, 0, 1, int(f"0x{raw_data_sampling_rate:02x}00", 16)])
+    time.sleep(1)
+    client.write_multiple_register(write_register, [1, 97, 0, 1])
+    client.write_multiple_register(write_register, [1, 97, 0, 1])
+    time.sleep(1)
+    response = client.read_register(read_register, 5)
+    raw_data_sampling_rate = (response[4] >> 8) & 0xFF
+    print(f'Raw Data Sampling Rate is set to {raw_data_sampling_rate}')
+
+    # Raw Data Memory Size
+
+    
+    client.write_multiple_register(write_register, [2, 98, 0, 2, int(f"{raw_data_memmory_size}")])
+    client.write_multiple_register(write_register, [2, 98, 0, 2, int(f"{raw_data_memmory_size}")])
+    
+    time.sleep(1)
+    client.write_multiple_register(write_register, [1, 98, 0, 2])
+    client.write_multiple_register(write_register, [1, 98, 0, 2])
+    time.sleep(1)
+    response = client.read_register(read_register, 5)
+    raw_data_memmory_size = response[4]
+    print(f'Raw Data Memory Size is set to {raw_data_memmory_size}')
+
+    # BLOB – Raw Data Recording Time
+
+    client.write_multiple_register(write_register, [1, 99, 0, 4])
+    client.write_multiple_register(write_register, [1, 99, 0, 4])
+    time.sleep(1)
+    response = client.read_register(read_register, 6)
+    recording_time = (response[4] << 16) + response[5]
+    print(f'BLOB Raw Data Recording Time is {recording_time:.2f} seconds or {recording_time / 60:.2f} minutes')
+
+    # BLOB – Raw Data Transfer Time
+
+    client.write_multiple_register(write_register, [1, 100, 0, 2])
+    client.write_multiple_register(write_register, [1, 100, 0, 2])
+    time.sleep(0.5)
+    response = client.read_register(read_register, 5)
+    print(f'BLOB Raw Data Transfer Time is {response[4]:.2f} seconds or {response[4]/60:.2f} minutes') 
 
 if __name__ == "__main__":
     host = '192.168.137.21'  # Update with your Modbus TCP server IP
@@ -144,6 +218,31 @@ if __name__ == "__main__":
     client = ModbusClientWrapper(host, port, unit_id)
 
     port_number = 4 #port on ICE2 which VIM is connected to
+    ssc_trigger = 0
+    # 0:Inactive
+    # 1:SSC1.1 - vRMS
+    # 2:SSC1.2 - vRMS
+    # 3:SSC2.1 - aRMS
+    # 4:SSC2.2 - aRMS
+    # 5:SSC3.1 - aPeak
+    # 6:SSC3.2 - aPeak
+    # 7:SSC4.1 - Temperature
+    # 8:SSC4.2 - Temperature
+    # 9:SSC5.1 - Crest
+    # 10:SSC5.2 - Crest
+    # 11:SSC6.1 - Bearing Condition
+    # 12:SSC6.2 - Bearing Condition
+    raw_data_sampling_rate = 5
+    # 0:64 kHz sampling rate, 12 kHz low-pass
+    # 1:32 kHz sampling rate, 6 kHz low-pass
+    # 2:16 kHz sampling rate, 3 kHz low-pass
+    # 3:8 kHz sampling rate, 1.5 kHz low-pass
+    # 4:4 kHz sampling rate, 0.75 kHz low-pass
+    # 5:2 kHz sampling rate, 0.3 kHz low-pass
+    raw_data_memmory_size = 5
+
+    blob_config(port_number,ssc_trigger, raw_data_sampling_rate, raw_data_memmory_size)
+    
 
     time.sleep(1)
     blob_id_response = read_blob_id_status(port_number)
