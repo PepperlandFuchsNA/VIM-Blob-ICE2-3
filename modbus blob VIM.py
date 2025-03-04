@@ -232,7 +232,7 @@ if __name__ == "__main__":
     # 10:SSC5.2 - Crest
     # 11:SSC6.1 - Bearing Condition
     # 12:SSC6.2 - Bearing Condition
-    raw_data_sampling_rate = 5
+    raw_data_sampling_rate = 0
     # 0:64 kHz sampling rate, 12 kHz low-pass
     # 1:32 kHz sampling rate, 6 kHz low-pass
     # 2:16 kHz sampling rate, 3 kHz low-pass
