@@ -241,7 +241,7 @@ if __name__ == "__main__":
     # 5:2 kHz sampling rate, 0.3 kHz low-pass
     raw_data_memmory_size = 5
 
-    blob_config(port_number,ssc_trigger, raw_data_sampling_rate, raw_data_memmory_size)
+    blob_config(port_number,ssc_trigger, raw_data_sampling_rate, raw_data_memmory_size) #configuring the blob parameters
     
 
     time.sleep(1)
