@@ -43,12 +43,6 @@ The project configures the Balluff data provider through IO-Link ISDU, triggers 
 Install dependencies:
 
 ```bash
-pip install pyModbusTCP python-dotenv
-```
-
-If your project includes a `requirements.txt`, use:
-
-```bash
 pip install -r requirements.txt
 ```
 
