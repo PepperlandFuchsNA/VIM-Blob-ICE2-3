@@ -89,10 +89,7 @@ Python 3.10+
 Install dependencies:
 
 ```bash
-pip install pyModbusTCP python-dotenv
-```
-
-`python-dotenv` is optional but recommended. Without it, environment variables must be set manually in the terminal.
+pip install -r requirements.txt
 
 ---
 
