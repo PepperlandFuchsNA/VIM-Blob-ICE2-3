@@ -1,7 +1,7 @@
 # blob_state_machine.py
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum, auto
 from pathlib import Path
@@ -29,6 +29,30 @@ class BlobState(Enum):
 
 
 @dataclass
+class BlobTransferDiagnostics:
+    """Engineering diagnostics for one BLOB transfer."""
+    expected_payload_length: Optional[int] = None
+    actual_payload_length: int = 0
+    saw_info_packet: bool = False
+    saw_final_packet: bool = False
+    saw_crc_packet: bool = False
+    info_packet_hex: Optional[str] = None
+    crc_packet_hex: Optional[str] = None
+    crc_bytes: Optional[bytes] = None
+    markers_seen: list[str] = field(default_factory=list)
+    counter_mismatches: list[str] = field(default_factory=list)
+    validation_warnings: list[str] = field(default_factory=list)
+
+    @property
+    def has_counter_mismatch(self) -> bool:
+        return bool(self.counter_mismatches)
+
+    @property
+    def has_validation_warnings(self) -> bool:
+        return bool(self.validation_warnings)
+
+
+@dataclass
 class BlobStateMachineResult:
     success: bool
     blob_type: str
@@ -37,6 +61,7 @@ class BlobStateMachineResult:
     final_state: BlobState
     error: Optional[str] = None
     csv_path: Optional[str] = None
+    diagnostics: BlobTransferDiagnostics = field(default_factory=BlobTransferDiagnostics)
 
 
 @dataclass
@@ -208,6 +233,69 @@ def read_blob_marker() -> tuple[Optional[int], bytes]:
     return data[0], data
 
 
+def _packet_hex(data: bytes, limit: int = 32) -> str:
+    """Return compact packet hex for logs without dumping huge payloads."""
+    if len(data) <= limit:
+        return data.hex(" ").upper()
+    return f"{data[:limit].hex(' ').upper()} ... ({len(data)} bytes)"
+
+
+def _extract_expected_length_from_info_packet(
+    data: bytes,
+    payload_length_offset: Optional[int] = None,
+    payload_length_size: int = 4,
+    byteorder: str = "big",
+) -> Optional[int]:
+    """
+    Extract expected BLOB payload length from a 0x10 info packet.
+
+    The Balluff workflow describes 0x10 as the info packet containing the total
+    length. The exact byte offset can vary by documentation/firmware, so an
+    explicit offset is supported. Without one, this uses a conservative
+    auto-detect fallback and only accepts plausible values.
+    """
+    if not data or data[0] != 0x10:
+        return None
+
+    if payload_length_size not in (2, 4):
+        raise ValueError("payload_length_size must be 2 or 4")
+
+    if payload_length_offset is not None:
+        start = int(payload_length_offset)
+        end = start + int(payload_length_size)
+        if start < 1 or end > len(data):
+            raise ValueError(
+                f"Invalid BLOB info length field offset/size: "
+                f"offset={payload_length_offset}, size={payload_length_size}, "
+                f"packet_length={len(data)}"
+            )
+        return int.from_bytes(data[start:end], byteorder=byteorder, signed=False)
+
+    candidates: list[int] = []
+    for size in (4, 2):
+        if len(data) < 1 + size:
+            continue
+        offsets = list(range(1, min(len(data) - size + 1, 9)))
+        tail_offset = len(data) - size
+        if tail_offset >= 1 and tail_offset not in offsets:
+            offsets.append(tail_offset)
+        for offset in offsets:
+            value = int.from_bytes(data[offset:offset + size], byteorder=byteorder, signed=False)
+            if 4 <= value <= 10_000_000:
+                candidates.append(value)
+
+    if not candidates:
+        return None
+
+    # Prefer the largest plausible value because metadata fields are often small.
+    return max(candidates)
+
+
+def _trim_payload_to_expected_length(payload: bytearray, expected_length: Optional[int]) -> None:
+    if expected_length is not None and len(payload) > expected_length:
+        del payload[expected_length:]
+
+
 def make_timestamped_csv_path(blob_type: str, output_dir: str = "blob_csv") -> str:
     Path(output_dir).mkdir(parents=True, exist_ok=True)
 
@@ -309,21 +397,22 @@ def run_acquisition_until_ready(
     wait_for_write_responses: bool = False,
     restart_before_config: bool = True,
     cleanup_before_acquisition: bool = True,
+    force_reconfigure: bool = False,
+    reuse_ready_data: bool = True,
 ) -> BlobState:
     """
-    Runs the acquisition part of the Balluff BLOB flow once.
+    Runs the acquisition part of the Balluff BLOB flow.
 
-    This does:
-      CONFIGURE_SENSOR
-      WAIT_STATUS_1
-      START_COLLECTION
-      WAIT_STATUS_2_OR_3
-      WAIT_STATUS_3
+    Status-aware behavior:
+      status 0 -> configure, wait for 1, trigger, wait for 3
+      status 1 -> already configured, trigger, wait for 3
+      status 2 -> already collecting/preparing, wait for 3
+      status 3 -> data is already ready; either reuse it or reconfigure for a new capture
 
-    After this, the selected sensor data is ready and multiple BLOBs can be transferred.
+    After this returns WAIT_STATUS_3, one or more BLOB transfers can be performed
+    by selecting BLOB IDs through index 50.
     """
     blob_types = validate_blob_types(blob_types)
-    state = BlobState.CONFIGURE_SENSOR
     start_time = time.monotonic()
 
     print("\nStarting BLOB acquisition state machine...")
@@ -332,83 +421,138 @@ def run_acquisition_until_ready(
     print(f"RADPTM_value: {RADPTM_value}")
     print(f"DCAS_value: {DCAS_value}")
     print(f"DCT_value: {DCT_value}")
+    print(f"force_reconfigure: {force_reconfigure}")
+    print(f"reuse_ready_data: {reuse_ready_data}")
 
-    if cleanup_before_acquisition:
-        print("Running best-effort BLOB cleanup before acquisition...")
-        cleanup_active_blob_transfer(
-            strategy="abort",
-            wait_for_write_responses=wait_for_write_responses,
-            quiet=False,
+    def remaining_timeout() -> float:
+        remaining = timeout_s - (time.monotonic() - start_time)
+        if remaining <= 0:
+            raise TimeoutError(
+                f"Acquisition timeout after {timeout_s} seconds."
+            )
+        return remaining
+
+    def print_status_snapshot(label: str) -> dict[str, int]:
+        statuses = selected_statuses(blob_types)
+        pretty = {
+            blob_type: f"{status} ({BF.BLOB_STATUS_TEXT.get(status, 'Unknown')})"
+            for blob_type, status in statuses.items()
+        }
+        print(f"{label} selected BLOB statuses: {pretty}")
+        return statuses
+
+    def run_cleanup_if_enabled() -> None:
+        if cleanup_before_acquisition:
+            print("Running best-effort BLOB transfer cleanup before acquisition...")
+            cleanup_active_blob_transfer(
+                strategy="abort",
+                wait_for_write_responses=wait_for_write_responses,
+                quiet=False,
+            )
+
+    def run_restart_if_enabled() -> None:
+        if restart_before_config:
+            try:
+                print(BF.Restart_Raw_Data_Feature(wait_for_response=wait_for_write_responses))
+                time.sleep(0.2)
+            except Exception as exc:
+                logger.warning("Raw data feature restart failed before config: %s", exc)
+                print(f"Warning: raw data feature restart failed before config: {exc}")
+
+    def configure_sensor() -> None:
+        print(f"\nCurrent acquisition state: {BlobState.CONFIGURE_SENSOR.name}")
+        result = BF.Sensor_Blob_Configuration(
+            DPTG_value=DPTG_value,
+            RADPTM_value=RADPTM_value,
+            DCAS_value=DCAS_value,
+            DCT_value=DCT_value,
+            wait_for_response=wait_for_write_responses,
+        )
+        print(result)
+
+        print(f"\nCurrent acquisition state: {BlobState.WAIT_STATUS_1.name}")
+        wait_for_selected_blob_statuses(
+            blob_types=blob_types,
+            allowed_statuses=1,
+            timeout_s=remaining_timeout(),
+            poll_s=poll_s,
         )
 
-    if restart_before_config:
-        try:
-            print(BF.Restart_Raw_Data_Feature(wait_for_response=wait_for_write_responses))
-            time.sleep(0.2)
-        except Exception as exc:
-            logger.warning("Raw data feature restart failed before config: %s", exc)
-            print(f"Warning: raw data feature restart failed before config: {exc}")
+    def start_collection_and_wait_ready() -> BlobState:
+        print(f"\nCurrent acquisition state: {BlobState.START_COLLECTION.name}")
+        result = BF.Trigger_Start_Collection(
+            wait_for_response=wait_for_write_responses,
+        )
+        print(result)
 
-    while state not in (BlobState.WAIT_STATUS_3, BlobState.ERROR):
-        elapsed = time.monotonic() - start_time
+        print(f"\nCurrent acquisition state: {BlobState.WAIT_STATUS_2_OR_3.name}")
+        # Some captures complete so quickly that polling misses status 2.
+        wait_for_selected_blob_statuses(
+            blob_types=blob_types,
+            allowed_statuses={2, 3},
+            timeout_s=remaining_timeout(),
+            poll_s=poll_s,
+        )
 
-        if elapsed > timeout_s:
-            raise TimeoutError(
-                f"Acquisition timeout after {timeout_s} seconds. "
-                f"Last state: {state.name}"
-            )
+        print(f"\nCurrent acquisition state: {BlobState.WAIT_STATUS_3.name}")
+        wait_for_selected_blob_statuses(
+            blob_types=blob_types,
+            allowed_statuses=3,
+            timeout_s=remaining_timeout(),
+            poll_s=poll_s,
+        )
 
-        print(f"\nCurrent acquisition state: {state.name}")
+        print("\nSensor data is ready for BLOB transfer.")
+        return BlobState.WAIT_STATUS_3
 
-        if state == BlobState.CONFIGURE_SENSOR:
-            result = BF.Sensor_Blob_Configuration(
-                DPTG_value=DPTG_value,
-                RADPTM_value=RADPTM_value,
-                DCAS_value=DCAS_value,
-                DCT_value=DCT_value,
-                wait_for_response=wait_for_write_responses,
-            )
-            print(result)
-            state = BlobState.WAIT_STATUS_1
+    initial_statuses = print_status_snapshot("Initial")
+    initial_values = set(initial_statuses.values())
 
-        elif state == BlobState.WAIT_STATUS_1:
-            wait_for_selected_blob_statuses(
-                blob_types=blob_types,
-                allowed_statuses=1,
-                timeout_s=timeout_s,
-                poll_s=poll_s,
-            )
-            state = BlobState.START_COLLECTION
+    # Status 3 means a dataset is already captured and available.
+    # Do not restart/reconfigure unless the caller explicitly wants a new capture.
+    if initial_values == {3} and reuse_ready_data and not force_reconfigure:
+        print(
+            "\nSelected BLOB data is already ready for transfer. "
+            "Skipping configuration and trigger."
+        )
+        return BlobState.WAIT_STATUS_3
 
-        elif state == BlobState.START_COLLECTION:
-            result = BF.Trigger_Start_Collection(
-                wait_for_response=wait_for_write_responses,
-            )
-            print(result)
-            state = BlobState.WAIT_STATUS_2_OR_3
+    # Status 2 means a capture is already in progress.
+    if initial_values == {2} and not force_reconfigure:
+        print("\nSelected BLOB data is already collecting/preparing. Waiting for status 3.")
+        print(f"\nCurrent acquisition state: {BlobState.WAIT_STATUS_3.name}")
+        wait_for_selected_blob_statuses(
+            blob_types=blob_types,
+            allowed_statuses=3,
+            timeout_s=remaining_timeout(),
+            poll_s=poll_s,
+        )
+        print("\nSensor data is ready for BLOB transfer.")
+        return BlobState.WAIT_STATUS_3
 
-        elif state == BlobState.WAIT_STATUS_2_OR_3:
-            # Some captures can complete so quickly that polling misses status 2.
-            wait_for_selected_blob_statuses(
-                blob_types=blob_types,
-                allowed_statuses={2, 3},
-                timeout_s=timeout_s,
-                poll_s=poll_s,
-            )
-            state = BlobState.WAIT_STATUS_3
+    # Status 1 means the sensor is already configured and waiting for trigger.
+    if initial_values == {1} and not force_reconfigure:
+        print("\nSensor is already configured and waiting for trigger.")
+        run_cleanup_if_enabled()
+        return start_collection_and_wait_ready()
 
-    print(f"\nCurrent acquisition state: {state.name}")
+    # Status 0, mixed states, forced reconfigure, or ready-data-with-new-capture request.
+    if force_reconfigure:
+        print("\nforce_reconfigure=True. Reconfiguring sensor before acquisition.")
+    elif initial_values == {0}:
+        print("\nBLOB function is inactive for selected data. Configuring sensor.")
+    elif initial_values == {3} and not reuse_ready_data:
+        print("\nData is already ready, but reuse_ready_data=False. Starting a new configured capture.")
+    else:
+        print(
+            "\nSelected BLOB statuses are mixed or not directly reusable. "
+            "Reconfiguring sensor to get a clean acquisition state."
+        )
 
-    wait_for_selected_blob_statuses(
-        blob_types=blob_types,
-        allowed_statuses=3,
-        timeout_s=timeout_s,
-        poll_s=poll_s,
-    )
-
-    print("\nSensor data is ready for BLOB transfer.")
-    return BlobState.WAIT_STATUS_3
-
+    run_cleanup_if_enabled()
+    run_restart_if_enabled()
+    configure_sensor()
+    return start_collection_and_wait_ready()
 
 def collect_single_blob_transfer(
     blob_type: str,
@@ -418,23 +562,24 @@ def collect_single_blob_transfer(
     include_0x30_payload: bool = True,
     cleanup_on_error: bool = True,
     cleanup_strategy_on_error: str = "abort",
+    strict_transfer: bool = True,
+    validate_packet_counter: bool = True,
+    validate_expected_length: bool = True,
+    blob_info_payload_length_offset: Optional[int] = None,
+    blob_info_payload_length_size: int = 4,
+    expected_payload_length: Optional[int] = None,
+    trim_to_expected_length: bool = True,
 ) -> BlobStateMachineResult:
     """
     Transfers one BLOB from already-ready sensor data.
 
-    This assumes the selected data provider status is already 3.
-
-    Flow:
-      SEND_BLOB_START
-      READ_BLOB_PACKETS until 0x30
-      WAIT_BLOB_END_40
-      SEND_BLOB_FINISH
-
-    Marker handling:
-      0x10 = BLOB start accepted
-      0x2n = data packet with 4-bit packet counter n
-      0x30 = last data packet marker
-      0x40 = BLOB transfer ready to finish
+    Production-oriented behavior:
+      - records 0x10 info packet diagnostics
+      - tracks every marker seen
+      - validates 0x2n packet counter sequence in strict mode
+      - prevents repeated 0x30 from appending duplicate final payload
+      - records 0x40 CRC/end packet bytes for traceability
+      - validates payload length when the expected length is known
     """
     if blob_type not in BF.BLOB_TYPE_TO_ID:
         raise ValueError(f"Unsupported BLOB type: {blob_type}")
@@ -444,8 +589,48 @@ def collect_single_blob_transfer(
     expected_counter = 0
     packet_count = 0
     start_time = time.monotonic()
+    final_packet_consumed = False
+
+    diagnostics = BlobTransferDiagnostics(expected_payload_length=expected_payload_length)
 
     print(f"\nStarting transfer for BLOB type: {blob_type}")
+
+    def record_marker(marker: int, data: bytes) -> None:
+        diagnostics.markers_seen.append(f"0x{marker:02X}")
+        logger.debug(
+            "%s marker=0x%02X length=%s packet=%s",
+            blob_type,
+            marker,
+            len(data),
+            _packet_hex(data),
+        )
+
+    def add_counter_mismatch(message: str) -> None:
+        diagnostics.counter_mismatches.append(message)
+        print(f"Warning for {blob_type}: {message}")
+        logger.warning("%s: %s", blob_type, message)
+        if strict_transfer and validate_packet_counter:
+            raise RuntimeError(message)
+
+    def add_warning(message: str) -> None:
+        diagnostics.validation_warnings.append(message)
+        print(f"Warning for {blob_type}: {message}")
+        logger.warning("%s: %s", blob_type, message)
+
+    def length_is_trusted() -> bool:
+        # A length supplied by the caller or parsed from a documented explicit
+        # offset is trusted. Auto-detected length is recorded for diagnostics
+        # only, because the exact 0x10 layout may differ by sensor firmware.
+        return expected_payload_length is not None or blob_info_payload_length_offset is not None
+
+    def append_payload(packet_payload: bytes) -> None:
+        payload.extend(packet_payload)
+        if (
+            trim_to_expected_length
+            and diagnostics.expected_payload_length is not None
+            and length_is_trusted()
+        ):
+            _trim_payload_to_expected_length(payload, diagnostics.expected_payload_length)
 
     try:
         while state not in (BlobState.DONE, BlobState.ERROR):
@@ -475,13 +660,37 @@ def collect_single_blob_transfer(
                     time.sleep(packet_poll_s)
                     continue
 
+                record_marker(marker, data)
                 print(
                     f"{blob_type} marker = 0x{marker:02X}, "
                     f"packet length = {len(data)} bytes"
                 )
 
                 if marker == 0x10:
-                    # Start accepted. Keep reading; no payload in this packet.
+                    diagnostics.saw_info_packet = True
+                    diagnostics.info_packet_hex = _packet_hex(data)
+
+                    if diagnostics.expected_payload_length is None:
+                        try:
+                            diagnostics.expected_payload_length = _extract_expected_length_from_info_packet(
+                                data=data,
+                                payload_length_offset=blob_info_payload_length_offset,
+                                payload_length_size=blob_info_payload_length_size,
+                            )
+                        except Exception as exc:
+                            add_warning(f"Could not parse 0x10 BLOB info length: {exc}")
+
+                    if diagnostics.expected_payload_length is not None:
+                        print(
+                            f"{blob_type}: expected payload length from BLOB info = "
+                            f"{diagnostics.expected_payload_length} bytes"
+                        )
+                    else:
+                        add_warning(
+                            "0x10 info packet received, but expected payload length "
+                            "could not be determined. Length validation will be skipped."
+                        )
+
                     time.sleep(packet_poll_s)
                     continue
 
@@ -489,34 +698,47 @@ def collect_single_blob_transfer(
                     counter = marker & 0x0F
 
                     if counter != expected_counter:
-                        print(
-                            f"Warning for {blob_type}: packet counter mismatch. "
-                            f"Expected {expected_counter}, got {counter}."
+                        add_counter_mismatch(
+                            f"packet counter mismatch. Expected {expected_counter}, got {counter}."
                         )
 
                     expected_counter = (counter + 1) % 16
                     packet_count += 1
-                    payload.extend(data[1:])
+                    append_payload(data[1:])
                     time.sleep(packet_poll_s)
                     continue
 
                 if marker == 0x30:
+                    diagnostics.saw_final_packet = True
                     print(f"{blob_type}: received final data marker 0x30.")
 
-                    if include_0x30_payload and len(data) > 1:
-                        payload.extend(data[1:])
-                        packet_count += 1
+                    if not final_packet_consumed:
+                        if include_0x30_payload and len(data) > 1:
+                            packet_count += 1
+                            append_payload(data[1:])
+                        final_packet_consumed = True
+                    else:
+                        add_warning(
+                            "Repeated 0x30 received; final payload was already consumed, "
+                            "so duplicate bytes were ignored."
+                        )
 
                     state = BlobState.WAIT_BLOB_END_40
                     time.sleep(packet_poll_s)
                     continue
 
                 if marker == 0x40:
+                    diagnostics.saw_crc_packet = True
+                    diagnostics.crc_packet_hex = _packet_hex(data)
+                    diagnostics.crc_bytes = data[1:] if len(data) > 1 else b""
                     print(f"{blob_type}: received 0x40. Ready to send BLOB_Finish.")
                     state = BlobState.SEND_BLOB_FINISH
                     continue
 
-                print(f"{blob_type}: unexpected marker while reading packets: 0x{marker:02X}")
+                message = f"unexpected marker while reading packets: 0x{marker:02X}"
+                if strict_transfer:
+                    raise RuntimeError(message)
+                add_warning(message)
                 time.sleep(packet_poll_s)
 
             elif state == BlobState.WAIT_BLOB_END_40:
@@ -526,53 +748,86 @@ def collect_single_blob_transfer(
                     time.sleep(packet_poll_s)
                     continue
 
+                record_marker(marker, data)
                 print(
                     f"{blob_type} end-wait marker = 0x{marker:02X}, "
                     f"packet length = {len(data)} bytes"
                 )
 
                 if marker == 0x40:
+                    diagnostics.saw_crc_packet = True
+                    diagnostics.crc_packet_hex = _packet_hex(data)
+                    diagnostics.crc_bytes = data[1:] if len(data) > 1 else b""
                     state = BlobState.SEND_BLOB_FINISH
                     continue
 
-                # Defensive handling: if the device still has late data packets,
-                # do not discard them.
                 if (marker & 0xF0) == 0x20:
                     counter = marker & 0x0F
 
                     if counter != expected_counter:
-                        print(
-                            f"Warning for {blob_type}: late packet counter mismatch. "
-                            f"Expected {expected_counter}, got {counter}."
+                        add_counter_mismatch(
+                            f"late packet counter mismatch. Expected {expected_counter}, got {counter}."
                         )
 
                     expected_counter = (counter + 1) % 16
                     packet_count += 1
-                    payload.extend(data[1:])
+                    append_payload(data[1:])
                     time.sleep(packet_poll_s)
                     continue
 
                 if marker == 0x30:
-                    print(f"{blob_type}: repeated 0x30 while waiting for 0x40.")
-                    if include_0x30_payload and len(data) > 1:
-                        payload.extend(data[1:])
-                        packet_count += 1
+                    diagnostics.saw_final_packet = True
+                    if final_packet_consumed:
+                        add_warning(
+                            "Repeated 0x30 while waiting for 0x40; duplicate final payload ignored."
+                        )
+                    else:
+                        print(f"{blob_type}: late 0x30 received while waiting for 0x40.")
+                        if include_0x30_payload and len(data) > 1:
+                            packet_count += 1
+                            append_payload(data[1:])
+                        final_packet_consumed = True
                     time.sleep(packet_poll_s)
                     continue
 
-                print(f"{blob_type}: unexpected marker while waiting for 0x40: 0x{marker:02X}")
+                message = f"unexpected marker while waiting for 0x40: 0x{marker:02X}"
+                if strict_transfer:
+                    raise RuntimeError(message)
+                add_warning(message)
                 time.sleep(packet_poll_s)
 
             elif state == BlobState.SEND_BLOB_FINISH:
+                if (
+                    validate_expected_length
+                    and diagnostics.expected_payload_length is not None
+                    and length_is_trusted()
+                ):
+                    if len(payload) != diagnostics.expected_payload_length:
+                        raise RuntimeError(
+                            f"Payload length mismatch for {blob_type}. "
+                            f"Expected {diagnostics.expected_payload_length} bytes, got {len(payload)} bytes."
+                        )
+
+                if strict_transfer and not diagnostics.saw_final_packet:
+                    raise RuntimeError(f"Final data marker 0x30 was not seen for {blob_type}.")
+
+                if strict_transfer and not diagnostics.saw_crc_packet:
+                    raise RuntimeError(f"CRC/end marker 0x40 was not seen for {blob_type}.")
+
                 result = BF.Write_Blob_Finish(
                     wait_for_response=wait_for_write_responses,
                 )
                 print(result)
                 state = BlobState.DONE
 
+        diagnostics.actual_payload_length = len(payload)
+
         print(f"\n{blob_type} transfer completed.")
         print(f"{blob_type} packet count: {packet_count}")
         print(f"{blob_type} payload bytes collected: {len(payload)}")
+        print(f"{blob_type} markers seen: {diagnostics.markers_seen}")
+        if diagnostics.crc_packet_hex:
+            print(f"{blob_type} CRC/end packet: {diagnostics.crc_packet_hex}")
 
         return BlobStateMachineResult(
             success=True,
@@ -582,9 +837,11 @@ def collect_single_blob_transfer(
             final_state=state,
             error=None,
             csv_path=None,
+            diagnostics=diagnostics,
         )
 
     except Exception as e:
+        diagnostics.actual_payload_length = len(payload)
         error_message = str(e)
         print(f"\n{blob_type} transfer failed: {error_message}")
 
@@ -604,8 +861,8 @@ def collect_single_blob_transfer(
             final_state=BlobState.ERROR,
             error=error_message,
             csv_path=None,
+            diagnostics=diagnostics,
         )
-
 
 def collect_ready_blobs_multi(
     blob_types: Iterable[str],
@@ -620,6 +877,12 @@ def collect_ready_blobs_multi(
     verify_ready_status: bool = True,
     continue_on_blob_error: bool = False,
     cleanup_on_error: bool = True,
+    strict_transfer: bool = True,
+    validate_packet_counter: bool = True,
+    validate_expected_length: bool = True,
+    blob_info_payload_length_offset: Optional[int] = None,
+    blob_info_payload_length_size: int = 4,
+    trim_to_expected_length: bool = True,
 ) -> MultiBlobStateMachineResult:
     """
     Transfer multiple BLOBs from an already-collected dataset.
@@ -646,6 +909,12 @@ def collect_ready_blobs_multi(
                 packet_poll_s=packet_poll_s,
                 wait_for_write_responses=wait_for_write_responses,
                 cleanup_on_error=cleanup_on_error,
+                strict_transfer=strict_transfer,
+                validate_packet_counter=validate_packet_counter,
+                validate_expected_length=validate_expected_length,
+                blob_info_payload_length_offset=blob_info_payload_length_offset,
+                blob_info_payload_length_size=blob_info_payload_length_size,
+                trim_to_expected_length=trim_to_expected_length,
             )
 
             if not transfer_result.success:
@@ -726,7 +995,16 @@ def run_blob_state_machine_multi(
     wait_for_write_responses: bool = False,
     restart_before_config: bool = True,
     cleanup_before_acquisition: bool = True,
+    force_reconfigure: bool = False,
+    reuse_ready_data: bool = True,
     continue_on_blob_error: bool = False,
+    cleanup_on_error: bool = True,
+    strict_transfer: bool = True,
+    validate_packet_counter: bool = True,
+    validate_expected_length: bool = True,
+    blob_info_payload_length_offset: Optional[int] = None,
+    blob_info_payload_length_size: int = 4,
+    trim_to_expected_length: bool = True,
 ) -> MultiBlobStateMachineResult:
     """
     Flexible multi-BLOB state machine.
@@ -772,6 +1050,8 @@ def run_blob_state_machine_multi(
             wait_for_write_responses=wait_for_write_responses,
             restart_before_config=restart_before_config,
             cleanup_before_acquisition=cleanup_before_acquisition,
+            force_reconfigure=force_reconfigure,
+            reuse_ready_data=reuse_ready_data,
         )
 
         result = collect_ready_blobs_multi(
@@ -786,7 +1066,13 @@ def run_blob_state_machine_multi(
             wait_for_write_responses=wait_for_write_responses,
             verify_ready_status=False,  # acquisition already confirmed status 3
             continue_on_blob_error=continue_on_blob_error,
-            cleanup_on_error=True,
+            cleanup_on_error=cleanup_on_error,
+            strict_transfer=strict_transfer,
+            validate_packet_counter=validate_packet_counter,
+            validate_expected_length=validate_expected_length,
+            blob_info_payload_length_offset=blob_info_payload_length_offset,
+            blob_info_payload_length_size=blob_info_payload_length_size,
+            trim_to_expected_length=trim_to_expected_length,
         )
 
         if result.success:
@@ -821,6 +1107,15 @@ def run_blob_state_machine(
     output_dir: str = "blob_csv",
     restart_before_config: bool = True,
     cleanup_before_acquisition: bool = True,
+    force_reconfigure: bool = False,
+    reuse_ready_data: bool = True,
+    cleanup_on_error: bool = True,
+    strict_transfer: bool = True,
+    validate_packet_counter: bool = True,
+    validate_expected_length: bool = True,
+    blob_info_payload_length_offset: Optional[int] = None,
+    blob_info_payload_length_size: int = 4,
+    trim_to_expected_length: bool = True,
 ) -> BlobStateMachineResult:
     """
     Backward-compatible single-BLOB wrapper.
@@ -841,6 +1136,15 @@ def run_blob_state_machine(
         output_dir=output_dir,
         restart_before_config=restart_before_config,
         cleanup_before_acquisition=cleanup_before_acquisition,
+        force_reconfigure=force_reconfigure,
+        reuse_ready_data=reuse_ready_data,
+        cleanup_on_error=cleanup_on_error,
+        strict_transfer=strict_transfer,
+        validate_packet_counter=validate_packet_counter,
+        validate_expected_length=validate_expected_length,
+        blob_info_payload_length_offset=blob_info_payload_length_offset,
+        blob_info_payload_length_size=blob_info_payload_length_size,
+        trim_to_expected_length=trim_to_expected_length,
     )
 
     if not multi_result.success:

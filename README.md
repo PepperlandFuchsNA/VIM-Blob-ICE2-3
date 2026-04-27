@@ -1,35 +1,39 @@
 # ICE3 Balluff BCM0003 BLOB Data Collector
 
-Python tooling for collecting vibration BLOB data from a **Balluff BCM0003** condition monitoring sensor connected to a **Pepperl+Fuchs ICE3 IO-Link master** over **Modbus/TCP**.
+Production-oriented Python tooling for collecting vibration BLOB data from a **Balluff BCM0003** condition monitoring sensor connected to a **Pepperl+Fuchs ICE3 IO-Link master** over **Modbus/TCP**.
 
-The project configures the Balluff data provider through IO-Link ISDU, triggers data collection, transfers BLOB payloads, parses the data, and exports timestamped CSV files.
-
----
-
-## Features
-
-- ICE3 ISDU communication over Modbus/TCP.
-- Sequential collection from IO-Link ports `1..8`.
-- Simultaneous multi-port collection using threaded per-port ISDU clients.
-- Balluff BCM0003 BLOB configuration, trigger, transfer, finish, abort, and restart handling.
-- Raw acceleration export for `rawX`, `rawY`, and `rawZ`.
-- Optional amplitude and envelope spectrum BLOB support.
-- Timestamped CSV output per BLOB and per port.
-- Recovery handling for interrupted or stuck BLOB transfers.
-- Console and file logging for commissioning and troubleshooting.
+The project configures the Balluff data provider through IO-Link ISDU, triggers a capture, transfers one or more BLOB payloads, validates the transfer, parses the payload, and exports timestamped CSV files.
 
 ---
 
-## Project Structure
+## What this project does
+
+- Communicates with the ICE3 IO-Link master over Modbus/TCP.
+- Reads and writes IO-Link ISDU parameters.
+- Configures Balluff BCM data-provider settings.
+- Starts a capture through ISDU trigger mode.
+- Transfers BLOB payloads through BLOB channel index `50`.
+- Supports raw acceleration and amplitude/envelope spectrum BLOBs.
+- Exports timestamped CSV files per BLOB and per IO-Link port.
+- Supports sequential multi-port collection.
+- Supports parallel multi-port collection using thread-local ISDU clients.
+- Adds recovery handling for stuck or interrupted BLOB transfers.
+- Adds stricter transfer diagnostics: markers seen, packet counter mismatches, payload length information, final marker, and CRC/end packet capture.
+
+---
+
+## Project structure
 
 ```text
 .
 ├── ModbusClientWrapper.py      # pyModbusTCP wrapper
-├── modbus_ISDU.py              # ICE3 ISDU client
-├── Balluff_blob_functions.py   # Balluff BCM0003 commands, constants, and parsers
-├── blob_state_machine.py       # Acquisition and BLOB transfer state machine
+├── modbus_ISDU.py              # ICE3 ISDU client and typed ISDUResponse
+├── Balluff_blob_functions.py   # Balluff BCM commands, constants, and payload parsers
+├── blob_state_machine.py       # Status-aware acquisition and strict BLOB transfer logic
 ├── run_multiple_ports.py       # Sequential multi-port runner
 ├── run_parallel_ports.py       # Simultaneous threaded multi-port runner
+├── requirements.txt            # Minimal runtime dependencies
+├── .env.example                # Example environment configuration
 └── README.md
 ```
 
@@ -39,8 +43,8 @@ The project configures the Balluff data provider through IO-Link ISDU, triggers 
 
 - Python 3.10 or newer
 - Pepperl+Fuchs ICE3 IO-Link master with Modbus/TCP enabled
-- Balluff BCM0003 connected to one or more ICE3 IO-Link ports
-- Python package: `pyModbusTCP`
+- Balluff BCM0003 connected to one or more IO-Link ports
+- Network access to TCP port `502` on the ICE3 master
 
 Install dependencies:
 
@@ -48,73 +52,78 @@ Install dependencies:
 pip install -r requirements.txt
 ```
 
-If you are using a `.env` file, install `python-dotenv` as well:
-
-```bash
-pip install python-dotenv
-```
-
 ---
 
 ## Configuration
 
-Create a `.env` file in the project folder:
+Copy the example environment file:
+
+```bash
+copy .env.example .env
+```
+
+On macOS/Linux:
+
+```bash
+cp .env.example .env
+```
+
+Edit `.env` for your setup:
 
 ```env
 ICE_HOST=192.168.137.21
 ICE_TCP_PORT=502
 ICE_UNIT_ID=1
-ICE_IOL_PORTS=1,2,3
+ICE_IOL_PORTS=1
 
-BLOB_TYPES=rawX,rawY,rawZ
+BLOB_TYPES=rawX
+DPTG_VALUE=2
+RADPTM_VALUE=0
+DCAS_VALUE=6
+DCT_VALUE=0
+
 BLOB_TIMEOUT_S=180
 BLOB_POLL_S=0.2
 BLOB_PACKET_POLL_S=0.05
 
+SAVE_CSV=true
 BLOB_OUTPUT_ROOT=blob_csv
-BLOB_LOG_DIR=blob_logs
-LOG_LEVEL=INFO
-
-PARALLEL_MAX_WORKERS=3
+WAIT_FOR_WRITE_RESPONSES=false
 ```
 
-Minimum required values:
-
-| Variable | Description |
-|---|---|
-| `ICE_HOST` | IP address of the ICE3 master. |
-| `ICE_TCP_PORT` | Modbus/TCP port, usually `502`. |
-| `ICE_UNIT_ID` | Modbus unit ID, usually `1`. |
-| `ICE_IOL_PORTS` | Comma-separated IO-Link ports to collect from. |
-| `BLOB_TYPES` | Comma-separated BLOB types, usually `rawX,rawY,rawZ`. |
+Use `ICE_IOL_PORTS`, not `PORTS_TO_TEST`.
 
 ---
 
-## Quick Start
+## Recommended commissioning sequence
 
-### Sequential collection
+Start small and scale up only after each step is stable.
 
-Run one port first:
+### 1. One port, raw X only
 
 ```powershell
 $env:ICE_IOL_PORTS="1"
+$env:BLOB_TYPES="rawX"
 python run_multiple_ports.py
 ```
 
-Run ports 1, 2, and 3 sequentially:
+### 2. One port, raw X/Y/Z
 
 ```powershell
-$env:ICE_IOL_PORTS="1,2,3"
+$env:ICE_IOL_PORTS="1"
+$env:BLOB_TYPES="rawX,rawY,rawZ"
 python run_multiple_ports.py
 ```
 
-Sequential collection is the safest commissioning mode because only one IO-Link port is active at a time.
+### 3. Two ports sequentially
 
----
+```powershell
+$env:ICE_IOL_PORTS="1,2"
+$env:BLOB_TYPES="rawX,rawY,rawZ"
+python run_multiple_ports.py
+```
 
-### Simultaneous collection
-
-Run two ports in parallel first:
+### 4. Two ports in parallel
 
 ```powershell
 $env:ICE_IOL_PORTS="1,2"
@@ -122,88 +131,102 @@ $env:PARALLEL_MAX_WORKERS="2"
 python run_parallel_ports.py
 ```
 
-Run ports 1 through 8 in parallel:
+Only after this is stable should you try more ports or all 8 ports.
 
-```powershell
-$env:ICE_IOL_PORTS="1,2,3,4,5,6,7,8"
-$env:PARALLEL_MAX_WORKERS="8"
+---
+
+## Status-aware acquisition behavior
+
+The state machine now checks the current Balluff data-provider status before deciding what to do.
+
+```text
+0 = data collection disabled       -> configure, wait for 1, trigger, wait for 3
+1 = waiting for trigger            -> trigger, wait for 3
+2 = preparing data                 -> wait for 3
+3 = data ready for BLOB transfer   -> reuse data or force a new capture
+```
+
+Useful options:
+
+```env
+FORCE_RECONFIGURE=false
+REUSE_READY_DATA=true
+```
+
+Use `FORCE_RECONFIGURE=true` when you want a brand-new capture every run.
+
+---
+
+## Transfer validation behavior
+
+The BLOB transfer logic now records and validates more information:
+
+- `0x10` info packet seen
+- `0x20` to `0x2F` data packet counters
+- `0x30` final data packet marker
+- `0x40` CRC/end packet
+- markers seen during transfer
+- packet counter mismatches
+- expected and actual payload length when known
+- validation warnings
+
+Default validation options:
+
+```env
+STRICT_TRANSFER=true
+VALIDATE_PACKET_COUNTER=true
+VALIDATE_EXPECTED_LENGTH=true
+TRIM_TO_EXPECTED_LENGTH=true
+```
+
+Important: expected-length validation is only enforced when the length is trusted. A length is trusted when you provide either:
+
+```env
+BLOB_INFO_LENGTH_OFFSET=<confirmed byte offset in the 0x10 packet>
+```
+
+or when the caller provides an explicit expected payload length in code.
+
+Without a confirmed offset, the code records a best-effort length estimate for diagnostics but does not use that estimate to fail or trim the transfer.
+
+---
+
+## Sequential collection
+
+Run:
+
+```bash
+python run_multiple_ports.py
+```
+
+This is the safest production/commissioning mode because each IO-Link port is handled one at a time.
+
+---
+
+## Parallel collection
+
+Run:
+
+```bash
 python run_parallel_ports.py
 ```
 
-The parallel runner creates an independent ISDU client per worker thread. Do not use `set_ice_isdu_client()` for parallel collection because that function changes a shared global client and is intended for sequential use only.
+The parallel runner uses a thread-local ISDU proxy so each worker thread gets its own client. This avoids unsafe global-client switching during simultaneous collection.
 
----
+Start with:
 
-## Default Acquisition
-
-The default collection target is raw acceleration for all three axes:
-
-```python
-blob_types = ["rawX", "rawY", "rawZ"]
-DPTG_value = 2      # ISDU trigger
-RADPTM_value = 0    # Raw acceleration starts after trigger
-DCAS_value = 6      # X, Y, Z axes
-DCT_value = 0       # Raw acceleration only
+```env
+ICE_IOL_PORTS=1,2
+PARALLEL_MAX_WORKERS=2
 ```
 
-Start with raw acceleration before enabling spectrum BLOBs.
-
----
-
-## Running from Python
-
-### Single port, raw X/Y/Z
-
-```python
-from Balluff_blob_functions import set_ice_isdu_client
-from blob_state_machine import run_blob_state_machine_multi
-
-set_ice_isdu_client(
-    host="192.168.137.21",
-    iol_port=1,
-    tcp_port=502,
-    unit_id=1,
-)
-
-result = run_blob_state_machine_multi(
-    blob_types=["rawX", "rawY", "rawZ"],
-    timeout_s=180.0,
-    poll_s=0.2,
-    packet_poll_s=0.05,
-    DPTG_value=2,
-    RADPTM_value=0,
-    DCAS_value=6,
-    DCT_value=0,
-    save_csv=True,
-    output_dir="blob_csv/port_1",
-    wait_for_write_responses=False,
-)
-
-for blob_type, transfer in result.results.items():
-    print(blob_type, transfer.success, transfer.csv_path)
-```
-
-### Transfer from already-ready data
-
-Use this after an acquisition has already completed and the BLOB status is ready:
-
-```python
-from blob_state_machine import collect_ready_blobs_multi
-
-result = collect_ready_blobs_multi(
-    blob_types=["rawY", "rawZ"],
-    timeout_s=180.0,
-    save_csv=True,
-    output_dir="blob_csv/port_1_extra",
-    verify_ready_status=True,
-)
-```
+Then increase one port at a time.
 
 ---
 
 ## Output
 
-CSV files are saved under the selected output directory:
+CSV files are saved under the selected output root:
 
 ```text
 blob_csv/
@@ -226,30 +249,39 @@ Raw acceleration CSV columns:
 
 ---
 
-## Important Notes
-
-- Keep `wait_for_write_responses=False` unless your ICE3 response behavior is confirmed stable. Writes can succeed even when immediate write-response polling times out.
-- Do not manually read Balluff `BLOB_CH` index `50` during an active transfer. Each read can advance the BLOB stream.
-- Use `run_multiple_ports.py` for sequential collection.
-- Use `run_parallel_ports.py` for simultaneous collection.
-- For parallel collection, each worker must use its own ISDU client. Avoid shared global client switching inside threads.
-- Start validation with `rawX` on one port before running all axes, multiple ports, or parallel collection.
-
----
-
 ## Troubleshooting
 
-### Cannot connect to ICE3
+### First run works, second run fails
 
-Check the ICE3 IP address, subnet, Modbus/TCP enable setting, firewall rules, and TCP port `502`.
+This usually means the sensor is no longer in status `0`. The status-aware state machine handles this by accepting status `1`, `2`, or `3` as valid entry states.
 
-### Timeout waiting for BLOB status
+For repeated testing, use:
 
-Confirm the sensor is connected to the selected IO-Link port, the port is in IO-Link mode, and the Balluff feature restarted correctly.
+```env
+REUSE_READY_DATA=true
+FORCE_RECONFIGURE=false
+```
 
-### Timeout during BLOB transfer
+For a brand-new capture every run, use:
 
-Run cleanup, then retry the acquisition:
+```env
+REUSE_READY_DATA=false
+FORCE_RECONFIGURE=true
+```
+
+### Timeout waiting for status `1`
+
+Check:
+
+- correct IO-Link port
+- Balluff sensor connected and online
+- ICE3 port in IO-Link mode
+- `DPTG_VALUE`, `RADPTM_VALUE`, `DCAS_VALUE`, `DCT_VALUE`
+- whether cleanup/restart commands are enabled
+
+### Timeout during transfer
+
+Run cleanup and retry:
 
 ```python
 from blob_state_machine import cleanup_active_blob_transfer
@@ -257,21 +289,24 @@ from blob_state_machine import cleanup_active_blob_transfer
 cleanup_active_blob_transfer(strategy="abort", quiet=False)
 ```
 
-### Parallel collection is unstable
+### Packet counter mismatch
 
-Reduce the number of workers and test two ports first:
+With `STRICT_TRANSFER=true`, this fails the transfer instead of saving questionable CSV data. For debugging only, you can temporarily set:
 
-```powershell
-$env:ICE_IOL_PORTS="1,2"
-$env:PARALLEL_MAX_WORKERS="2"
-python run_parallel_ports.py
+```env
+STRICT_TRANSFER=false
 ```
 
-If two ports are stable, increase one port at a time.
+### Parallel mode unstable
 
-### CSV parser error
+Reduce workers:
 
-Start with `rawX` only. Parser errors usually indicate an interrupted transfer, unexpected packet content, or a mismatch between selected BLOB type and payload.
+```env
+ICE_IOL_PORTS=1,2
+PARALLEL_MAX_WORKERS=2
+```
+
+Then increase one port at a time.
 
 ---
 

@@ -100,6 +100,13 @@ def _env_bool(name: str, default: bool) -> bool:
     return text in {"1", "true", "yes", "y", "on"}
 
 
+def _env_optional_int(name: str, default: Optional[int] = None) -> Optional[int]:
+    text = os.getenv(name)
+    if text is None or not text.strip():
+        return default
+    return int(text.strip())
+
+
 def _parse_int_list(text: str) -> list[int]:
     output: list[int] = []
     for part in text.split(","):
@@ -166,6 +173,14 @@ class ParallelRunConfig:
     restart_before_config: bool
     cleanup_before_acquisition: bool
     cleanup_on_error: bool
+    force_reconfigure: bool
+    reuse_ready_data: bool
+    strict_transfer: bool
+    validate_packet_counter: bool
+    validate_expected_length: bool
+    blob_info_payload_length_offset: Optional[int]
+    blob_info_payload_length_size: int
+    trim_to_expected_length: bool
 
 
 def load_config() -> ParallelRunConfig:
@@ -195,6 +210,14 @@ def load_config() -> ParallelRunConfig:
         restart_before_config=_env_bool("RESTART_BEFORE_CONFIG", True),
         cleanup_before_acquisition=_env_bool("CLEANUP_BEFORE_ACQUISITION", True),
         cleanup_on_error=_env_bool("CLEANUP_ON_ERROR", True),
+        force_reconfigure=_env_bool("FORCE_RECONFIGURE", False),
+        reuse_ready_data=_env_bool("REUSE_READY_DATA", True),
+        strict_transfer=_env_bool("STRICT_TRANSFER", True),
+        validate_packet_counter=_env_bool("VALIDATE_PACKET_COUNTER", True),
+        validate_expected_length=_env_bool("VALIDATE_EXPECTED_LENGTH", True),
+        blob_info_payload_length_offset=_env_optional_int("BLOB_INFO_LENGTH_OFFSET", None),
+        blob_info_payload_length_size=_env_int("BLOB_INFO_LENGTH_SIZE", 4),
+        trim_to_expected_length=_env_bool("TRIM_TO_EXPECTED_LENGTH", True),
     )
 
 
@@ -234,6 +257,14 @@ def run_one_port(iol_port: int, config: ParallelRunConfig) -> MultiBlobStateMach
         "restart_before_config": config.restart_before_config,
         "cleanup_before_acquisition": config.cleanup_before_acquisition,
         "cleanup_on_error": config.cleanup_on_error,
+        "force_reconfigure": config.force_reconfigure,
+        "reuse_ready_data": config.reuse_ready_data,
+        "strict_transfer": config.strict_transfer,
+        "validate_packet_counter": config.validate_packet_counter,
+        "validate_expected_length": config.validate_expected_length,
+        "blob_info_payload_length_offset": config.blob_info_payload_length_offset,
+        "blob_info_payload_length_size": config.blob_info_payload_length_size,
+        "trim_to_expected_length": config.trim_to_expected_length,
     }
 
     result = run_blob_state_machine_multi(
@@ -259,6 +290,9 @@ def main() -> int:
     print(f"Max workers: {config.max_workers}")
     print(f"BLOB types: {config.blob_types if config.blob_types is not None else 'auto'}")
     print(f"Output root: {config.output_root}")
+    print(f"Strict transfer: {config.strict_transfer}")
+    print(f"Reuse ready data: {config.reuse_ready_data}")
+    print(f"Force reconfigure: {config.force_reconfigure}")
     print("\nTip: start with ICE_IOL_PORTS=1,2 before running all 8 ports.\n")
 
     started = time.monotonic()
@@ -304,10 +338,18 @@ def main() -> int:
 
         print(f"Port {iol_port}: {'OK' if result.success else 'FAILED'}")
         for blob_type, transfer in result.results.items():
+            diag = transfer.diagnostics
             print(
                 f"  {blob_type}: success={transfer.success}, "
-                f"bytes={len(transfer.payload)}, csv={transfer.csv_path}"
+                f"bytes={len(transfer.payload)}, packets={transfer.packet_count}, "
+                f"csv={transfer.csv_path}"
             )
+            if diag.markers_seen:
+                print(f"    markers={diag.markers_seen}")
+            if diag.counter_mismatches:
+                print(f"    counter_mismatches={diag.counter_mismatches}")
+            if diag.validation_warnings:
+                print(f"    warnings={diag.validation_warnings}")
 
         if not result.success and result.error:
             print(f"  Error: {result.error}")
