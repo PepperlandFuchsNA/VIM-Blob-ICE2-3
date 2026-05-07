@@ -13,7 +13,7 @@ sampling_rate = 2000  # Sampling rate in Hz
 t = np.linspace(0, duration, int(sampling_rate * duration), endpoint=False) #added time vector for consitency
 
 # Load the CSV file
-file_path = 'g_values_fast_fan_2.xlsx'
+file_path = 'g_values.csv'
 file_extension = os.path.splitext(file_path)[1]
 
 if file_extension == '.csv':
@@ -24,7 +24,7 @@ else:
     raise ValueError("Unsupported file format")
 
 # Extract the first column (assuming the column name is 'actual_g')
-actual_g = data.iloc[:5000, 0]
+actual_g = data.iloc[:, 1]
 # Find the mean of the points and shift to zero
 mean_value = actual_g.mean()
 actual_g = actual_g - mean_value
