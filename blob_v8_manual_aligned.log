@@ -1,0 +1,311 @@
+2026-05-22 09:15:52,196 DEBUG balluff_bcm_blob_reader: ISDU READ request index=49, sub=0, length=2, request=[1, 49, 0, 2], strict=True
+2026-05-22 09:15:52,217 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [CA 6F 00 00 00 0F 01] 10 08 FC 00 04 08 00 01 00 31 00 00 00 02
+2026-05-22 09:15:52,243 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [CA 6F 00 00 00 06 01] 10 08 FC 00 04
+2026-05-22 09:15:52,444 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [07 F5 00 00 00 06 01] 03 08 34 00 05
+2026-05-22 09:15:52,446 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [07 F5 00 00 00 0D 01] 03 0A 20 01 00 31 00 00 00 02 F0 00
+2026-05-22 09:15:52,456 DEBUG balluff_bcm_blob_reader: ISDU response control/status=0x2001, status=2, type=1, index=49, subindex=0, len=2, raw=[8193, 49, 0, 2, 61440]
+2026-05-22 09:15:52,458 DEBUG balluff_bcm_blob_reader: ISDU WRITE request index=50, sub=0, payload=f2, request=[2, 50, 0, 1, 61952]
+2026-05-22 09:15:52,459 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [D9 D6 00 00 00 11 01] 10 08 FC 00 05 0A 00 02 00 32 00 00 00 01 F2 00
+2026-05-22 09:15:52,484 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [D9 D6 00 00 00 06 01] 10 08 FC 00 05
+2026-05-22 09:15:52,785 DEBUG balluff_bcm_blob_reader: ISDU WRITE request index=50, sub=0, payload=f0, request=[2, 50, 0, 1, 61440]
+2026-05-22 09:15:52,787 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [B4 29 00 00 00 11 01] 10 08 FC 00 05 0A 00 02 00 32 00 00 00 01 F0 00
+2026-05-22 09:15:52,817 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [B4 29 00 00 00 06 01] 10 08 FC 00 05
+2026-05-22 09:15:53,118 DEBUG balluff_bcm_blob_reader: ISDU WRITE request index=50, sub=0, payload=f2, request=[2, 50, 0, 1, 61952]
+2026-05-22 09:15:53,119 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [C3 06 00 00 00 11 01] 10 08 FC 00 05 0A 00 02 00 32 00 00 00 01 F2 00
+2026-05-22 09:15:53,145 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [C3 06 00 00 00 06 01] 10 08 FC 00 05
+2026-05-22 09:15:53,448 DEBUG balluff_bcm_blob_reader: ISDU WRITE request index=8603, sub=1, payload=02, request=[2, 8603, 1, 1, 512]
+2026-05-22 09:15:53,449 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [DF DB 00 00 00 11 01] 10 08 FC 00 05 0A 00 02 21 9B 00 01 00 01 02 00
+2026-05-22 09:15:53,909 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [DF DB 00 00 00 06 01] 10 08 FC 00 05
+2026-05-22 09:15:54,110 DEBUG balluff_bcm_blob_reader: ISDU WRITE request index=8603, sub=2, payload=00, request=[2, 8603, 2, 1, 0]
+2026-05-22 09:15:54,110 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [13 84 00 00 00 11 01] 10 08 FC 00 05 0A 00 02 21 9B 00 02 00 01 00 00
+2026-05-22 09:15:54,580 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [13 84 00 00 00 06 01] 10 08 FC 00 05
+2026-05-22 09:15:54,781 DEBUG balluff_bcm_blob_reader: ISDU WRITE request index=8603, sub=3, payload=06, request=[2, 8603, 3, 1, 1536]
+2026-05-22 09:15:54,781 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [01 FB 00 00 00 11 01] 10 08 FC 00 05 0A 00 02 21 9B 00 03 00 01 06 00
+2026-05-22 09:15:55,252 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [01 FB 00 00 00 06 01] 10 08 FC 00 05
+2026-05-22 09:15:55,453 DEBUG balluff_bcm_blob_reader: ISDU WRITE request index=8603, sub=4, payload=00, request=[2, 8603, 4, 1, 0]
+2026-05-22 09:15:55,455 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [67 37 00 00 00 11 01] 10 08 FC 00 05 0A 00 02 21 9B 00 04 00 01 00 00
+2026-05-22 09:15:55,918 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [67 37 00 00 00 06 01] 10 08 FC 00 05
+2026-05-22 09:15:56,120 DEBUG balluff_bcm_blob_reader: ISDU READ request index=8607, sub=1, length=1, request=[1, 8607, 1, 1], strict=True
+2026-05-22 09:15:56,121 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [6A CB 00 00 00 0F 01] 10 08 FC 00 04 08 00 01 21 9F 00 01 00 01
+2026-05-22 09:15:56,153 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [6A CB 00 00 00 06 01] 10 08 FC 00 04
+2026-05-22 09:15:56,354 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [A8 27 00 00 00 06 01] 03 08 34 00 05
+2026-05-22 09:15:56,355 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [A8 27 00 00 00 0D 01] 03 0A 20 01 21 9F 00 01 00 01 01 00
+2026-05-22 09:15:56,356 DEBUG balluff_bcm_blob_reader: ISDU response control/status=0x2001, status=2, type=1, index=8607, subindex=1, len=1, raw=[8193, 8607, 1, 1, 256]
+2026-05-22 09:15:56,358 DEBUG balluff_bcm_blob_reader: ISDU READ request index=8607, sub=2, length=1, request=[1, 8607, 2, 1], strict=True
+2026-05-22 09:15:56,360 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [3E FE 00 00 00 0F 01] 10 08 FC 00 04 08 00 01 21 9F 00 02 00 01
+2026-05-22 09:15:56,393 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [3E FE 00 00 00 06 01] 10 08 FC 00 04
+2026-05-22 09:15:56,596 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [69 04 00 00 00 06 01] 03 08 34 00 05
+2026-05-22 09:15:56,597 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [69 04 00 00 00 0D 01] 03 0A 20 01 21 9F 00 02 00 01 01 00
+2026-05-22 09:15:56,597 DEBUG balluff_bcm_blob_reader: ISDU response control/status=0x2001, status=2, type=1, index=8607, subindex=2, len=1, raw=[8193, 8607, 2, 1, 256]
+2026-05-22 09:15:56,598 DEBUG balluff_bcm_blob_reader: ISDU READ request index=8607, sub=3, length=1, request=[1, 8607, 3, 1], strict=True
+2026-05-22 09:15:56,600 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [54 DA 00 00 00 0F 01] 10 08 FC 00 04 08 00 01 21 9F 00 03 00 01
+2026-05-22 09:15:56,623 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [54 DA 00 00 00 06 01] 10 08 FC 00 04
+2026-05-22 09:15:56,825 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [4A ED 00 00 00 06 01] 03 08 34 00 05
+2026-05-22 09:15:56,827 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [4A ED 00 00 00 0D 01] 03 0A 20 01 21 9F 00 03 00 01 01 00
+2026-05-22 09:15:56,827 DEBUG balluff_bcm_blob_reader: ISDU response control/status=0x2001, status=2, type=1, index=8607, subindex=3, len=1, raw=[8193, 8607, 3, 1, 256]
+2026-05-22 09:15:56,827 DEBUG balluff_bcm_blob_reader: ISDU WRITE request index=8605, sub=0, payload=01, request=[2, 8605, 0, 1, 256]
+2026-05-22 09:15:56,829 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [6A 37 00 00 00 11 01] 10 08 FC 00 05 0A 00 02 21 9D 00 00 00 01 01 00
+2026-05-22 09:15:56,854 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [6A 37 00 00 00 06 01] 10 08 FC 00 05
+2026-05-22 09:15:57,054 DEBUG balluff_bcm_blob_reader: ISDU READ request index=8607, sub=1, length=1, request=[1, 8607, 1, 1], strict=True
+2026-05-22 09:15:57,056 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [40 D0 00 00 00 0F 01] 10 08 FC 00 04 08 00 01 21 9F 00 01 00 01
+2026-05-22 09:15:57,084 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [40 D0 00 00 00 06 01] 10 08 FC 00 04
+2026-05-22 09:15:57,286 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [A0 BD 00 00 00 06 01] 03 08 34 00 05
+2026-05-22 09:15:57,290 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [A0 BD 00 00 00 0D 01] 03 0A 20 01 21 9F 00 01 00 01 02 00
+2026-05-22 09:15:57,291 DEBUG balluff_bcm_blob_reader: ISDU response control/status=0x2001, status=2, type=1, index=8607, subindex=1, len=1, raw=[8193, 8607, 1, 1, 512]
+2026-05-22 09:15:57,293 DEBUG balluff_bcm_blob_reader: ISDU READ request index=8607, sub=2, length=1, request=[1, 8607, 2, 1], strict=True
+2026-05-22 09:15:57,294 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [55 C7 00 00 00 0F 01] 10 08 FC 00 04 08 00 01 21 9F 00 02 00 01
+2026-05-22 09:15:57,324 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [55 C7 00 00 00 06 01] 10 08 FC 00 04
+2026-05-22 09:15:57,525 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [4E 7C 00 00 00 06 01] 03 08 34 00 05
+2026-05-22 09:15:57,529 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [4E 7C 00 00 00 0D 01] 03 0A 20 01 21 9F 00 02 00 01 02 00
+2026-05-22 09:15:57,530 DEBUG balluff_bcm_blob_reader: ISDU response control/status=0x2001, status=2, type=1, index=8607, subindex=2, len=1, raw=[8193, 8607, 2, 1, 512]
+2026-05-22 09:15:57,531 DEBUG balluff_bcm_blob_reader: ISDU READ request index=8607, sub=3, length=1, request=[1, 8607, 3, 1], strict=True
+2026-05-22 09:15:57,532 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [D5 4A 00 00 00 0F 01] 10 08 FC 00 04 08 00 01 21 9F 00 03 00 01
+2026-05-22 09:15:57,565 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [D5 4A 00 00 00 06 01] 10 08 FC 00 04
+2026-05-22 09:15:57,767 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [74 69 00 00 00 06 01] 03 08 34 00 05
+2026-05-22 09:15:57,770 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [74 69 00 00 00 0D 01] 03 0A 20 01 21 9F 00 03 00 01 02 00
+2026-05-22 09:15:57,771 DEBUG balluff_bcm_blob_reader: ISDU response control/status=0x2001, status=2, type=1, index=8607, subindex=3, len=1, raw=[8193, 8607, 3, 1, 512]
+2026-05-22 09:15:57,771 DEBUG balluff_bcm_blob_reader: ISDU READ request index=8607, sub=1, length=1, request=[1, 8607, 1, 1], strict=True
+2026-05-22 09:15:57,773 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [F7 2A 00 00 00 0F 01] 10 08 FC 00 04 08 00 01 21 9F 00 01 00 01
+2026-05-22 09:15:57,804 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [F7 2A 00 00 00 06 01] 10 08 FC 00 04
+2026-05-22 09:15:58,005 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [86 0B 00 00 00 06 01] 03 08 34 00 05
+2026-05-22 09:15:58,009 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [86 0B 00 00 00 0D 01] 03 0A 20 01 21 9F 00 01 00 01 02 00
+2026-05-22 09:15:58,010 DEBUG balluff_bcm_blob_reader: ISDU response control/status=0x2001, status=2, type=1, index=8607, subindex=1, len=1, raw=[8193, 8607, 1, 1, 512]
+2026-05-22 09:15:58,262 DEBUG balluff_bcm_blob_reader: ISDU READ request index=8607, sub=1, length=1, request=[1, 8607, 1, 1], strict=True
+2026-05-22 09:15:58,262 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [98 1D 00 00 00 0F 01] 10 08 FC 00 04 08 00 01 21 9F 00 01 00 01
+2026-05-22 09:15:58,294 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [98 1D 00 00 00 06 01] 10 08 FC 00 04
+2026-05-22 09:15:58,495 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [71 DA 00 00 00 06 01] 03 08 34 00 05
+2026-05-22 09:15:58,496 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [71 DA 00 00 00 0D 01] 03 0A 20 01 21 9F 00 01 00 01 02 00
+2026-05-22 09:15:58,497 DEBUG balluff_bcm_blob_reader: ISDU response control/status=0x2001, status=2, type=1, index=8607, subindex=1, len=1, raw=[8193, 8607, 1, 1, 512]
+2026-05-22 09:15:58,748 DEBUG balluff_bcm_blob_reader: ISDU READ request index=8607, sub=1, length=1, request=[1, 8607, 1, 1], strict=True
+2026-05-22 09:15:58,749 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [08 42 00 00 00 0F 01] 10 08 FC 00 04 08 00 01 21 9F 00 01 00 01
+2026-05-22 09:15:58,775 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [08 42 00 00 00 06 01] 10 08 FC 00 04
+2026-05-22 09:15:58,977 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [69 8F 00 00 00 06 01] 03 08 34 00 05
+2026-05-22 09:15:58,980 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [69 8F 00 00 00 0D 01] 03 0A 20 01 21 9F 00 01 00 01 02 00
+2026-05-22 09:15:58,981 DEBUG balluff_bcm_blob_reader: ISDU response control/status=0x2001, status=2, type=1, index=8607, subindex=1, len=1, raw=[8193, 8607, 1, 1, 512]
+2026-05-22 09:15:59,232 DEBUG balluff_bcm_blob_reader: ISDU READ request index=8607, sub=1, length=1, request=[1, 8607, 1, 1], strict=True
+2026-05-22 09:15:59,233 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [1C 3A 00 00 00 0F 01] 10 08 FC 00 04 08 00 01 21 9F 00 01 00 01
+2026-05-22 09:15:59,265 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [1C 3A 00 00 00 06 01] 10 08 FC 00 04
+2026-05-22 09:15:59,466 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [91 4A 00 00 00 06 01] 03 08 34 00 05
+2026-05-22 09:15:59,471 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [91 4A 00 00 00 0D 01] 03 0A 20 01 21 9F 00 01 00 01 02 00
+2026-05-22 09:15:59,471 DEBUG balluff_bcm_blob_reader: ISDU response control/status=0x2001, status=2, type=1, index=8607, subindex=1, len=1, raw=[8193, 8607, 1, 1, 512]
+2026-05-22 09:15:59,722 DEBUG balluff_bcm_blob_reader: ISDU READ request index=8607, sub=1, length=1, request=[1, 8607, 1, 1], strict=True
+2026-05-22 09:15:59,723 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [3C 9C 00 00 00 0F 01] 10 08 FC 00 04 08 00 01 21 9F 00 01 00 01
+2026-05-22 09:15:59,755 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [3C 9C 00 00 00 06 01] 10 08 FC 00 04
+2026-05-22 09:15:59,956 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [BB 97 00 00 00 06 01] 03 08 34 00 05
+2026-05-22 09:15:59,958 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [BB 97 00 00 00 0D 01] 03 0A 20 01 21 9F 00 01 00 01 02 00
+2026-05-22 09:15:59,959 DEBUG balluff_bcm_blob_reader: ISDU response control/status=0x2001, status=2, type=1, index=8607, subindex=1, len=1, raw=[8193, 8607, 1, 1, 512]
+2026-05-22 09:16:00,210 DEBUG balluff_bcm_blob_reader: ISDU READ request index=8607, sub=1, length=1, request=[1, 8607, 1, 1], strict=True
+2026-05-22 09:16:00,211 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [04 53 00 00 00 0F 01] 10 08 FC 00 04 08 00 01 21 9F 00 01 00 01
+2026-05-22 09:16:00,245 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [04 53 00 00 00 06 01] 10 08 FC 00 04
+2026-05-22 09:16:00,447 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [01 AE 00 00 00 06 01] 03 08 34 00 05
+2026-05-22 09:16:00,452 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [01 AE 00 00 00 0D 01] 03 0A 20 01 21 9F 00 01 00 01 02 00
+2026-05-22 09:16:00,453 DEBUG balluff_bcm_blob_reader: ISDU response control/status=0x2001, status=2, type=1, index=8607, subindex=1, len=1, raw=[8193, 8607, 1, 1, 512]
+2026-05-22 09:16:00,704 DEBUG balluff_bcm_blob_reader: ISDU READ request index=8607, sub=1, length=1, request=[1, 8607, 1, 1], strict=True
+2026-05-22 09:16:00,705 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [12 13 00 00 00 0F 01] 10 08 FC 00 04 08 00 01 21 9F 00 01 00 01
+2026-05-22 09:16:00,735 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [12 13 00 00 00 06 01] 10 08 FC 00 04
+2026-05-22 09:16:00,936 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [B2 BB 00 00 00 06 01] 03 08 34 00 05
+2026-05-22 09:16:00,940 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [B2 BB 00 00 00 0D 01] 03 0A 20 01 21 9F 00 01 00 01 02 00
+2026-05-22 09:16:00,941 DEBUG balluff_bcm_blob_reader: ISDU response control/status=0x2001, status=2, type=1, index=8607, subindex=1, len=1, raw=[8193, 8607, 1, 1, 512]
+2026-05-22 09:16:01,192 DEBUG balluff_bcm_blob_reader: ISDU READ request index=8607, sub=1, length=1, request=[1, 8607, 1, 1], strict=True
+2026-05-22 09:16:01,193 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [AC 48 00 00 00 0F 01] 10 08 FC 00 04 08 00 01 21 9F 00 01 00 01
+2026-05-22 09:16:01,225 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [AC 48 00 00 00 06 01] 10 08 FC 00 04
+2026-05-22 09:16:01,426 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [81 56 00 00 00 06 01] 03 08 34 00 05
+2026-05-22 09:16:01,427 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [81 56 00 00 00 0D 01] 03 0A 20 01 21 9F 00 01 00 01 02 00
+2026-05-22 09:16:01,428 DEBUG balluff_bcm_blob_reader: ISDU response control/status=0x2001, status=2, type=1, index=8607, subindex=1, len=1, raw=[8193, 8607, 1, 1, 512]
+2026-05-22 09:16:01,679 DEBUG balluff_bcm_blob_reader: ISDU READ request index=8607, sub=1, length=1, request=[1, 8607, 1, 1], strict=True
+2026-05-22 09:16:01,680 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [AC 34 00 00 00 0F 01] 10 08 FC 00 04 08 00 01 21 9F 00 01 00 01
+2026-05-22 09:16:01,715 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [AC 34 00 00 00 06 01] 10 08 FC 00 04
+2026-05-22 09:16:01,917 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [C5 EC 00 00 00 06 01] 03 08 34 00 05
+2026-05-22 09:16:01,921 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [C5 EC 00 00 00 0D 01] 03 0A 20 01 21 9F 00 01 00 01 02 00
+2026-05-22 09:16:01,922 DEBUG balluff_bcm_blob_reader: ISDU response control/status=0x2001, status=2, type=1, index=8607, subindex=1, len=1, raw=[8193, 8607, 1, 1, 512]
+2026-05-22 09:16:02,173 DEBUG balluff_bcm_blob_reader: ISDU READ request index=8607, sub=1, length=1, request=[1, 8607, 1, 1], strict=True
+2026-05-22 09:16:02,175 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [F2 4F 00 00 00 0F 01] 10 08 FC 00 04 08 00 01 21 9F 00 01 00 01
+2026-05-22 09:16:02,205 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [F2 4F 00 00 00 06 01] 10 08 FC 00 04
+2026-05-22 09:16:02,407 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [81 60 00 00 00 06 01] 03 08 34 00 05
+2026-05-22 09:16:02,412 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [81 60 00 00 00 0D 01] 03 0A 20 01 21 9F 00 01 00 01 03 00
+2026-05-22 09:16:02,413 DEBUG balluff_bcm_blob_reader: ISDU response control/status=0x2001, status=2, type=1, index=8607, subindex=1, len=1, raw=[8193, 8607, 1, 1, 768]
+2026-05-22 09:16:02,414 DEBUG balluff_bcm_blob_reader: ISDU READ request index=8607, sub=2, length=1, request=[1, 8607, 2, 1], strict=True
+2026-05-22 09:16:02,414 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [9F 13 00 00 00 0F 01] 10 08 FC 00 04 08 00 01 21 9F 00 02 00 01
+2026-05-22 09:16:02,445 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [9F 13 00 00 00 06 01] 10 08 FC 00 04
+2026-05-22 09:16:02,647 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [51 35 00 00 00 06 01] 03 08 34 00 05
+2026-05-22 09:16:02,648 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [51 35 00 00 00 0D 01] 03 0A 20 01 21 9F 00 02 00 01 03 00
+2026-05-22 09:16:02,648 DEBUG balluff_bcm_blob_reader: ISDU response control/status=0x2001, status=2, type=1, index=8607, subindex=2, len=1, raw=[8193, 8607, 2, 1, 768]
+2026-05-22 09:16:02,650 DEBUG balluff_bcm_blob_reader: ISDU READ request index=8607, sub=3, length=1, request=[1, 8607, 3, 1], strict=True
+2026-05-22 09:16:02,651 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [AA 36 00 00 00 0F 01] 10 08 FC 00 04 08 00 01 21 9F 00 03 00 01
+2026-05-22 09:16:02,685 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [AA 36 00 00 00 06 01] 10 08 FC 00 04
+2026-05-22 09:16:02,886 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [14 77 00 00 00 06 01] 03 08 34 00 05
+2026-05-22 09:16:02,887 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [14 77 00 00 00 0D 01] 03 0A 20 01 21 9F 00 03 00 01 03 00
+2026-05-22 09:16:02,887 DEBUG balluff_bcm_blob_reader: ISDU response control/status=0x2001, status=2, type=1, index=8607, subindex=3, len=1, raw=[8193, 8607, 3, 1, 768]
+2026-05-22 09:16:02,888 DEBUG balluff_bcm_blob_reader: ISDU READ request index=8607, sub=1, length=1, request=[1, 8607, 1, 1], strict=True
+2026-05-22 09:16:02,889 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [0D 43 00 00 00 0F 01] 10 08 FC 00 04 08 00 01 21 9F 00 01 00 01
+2026-05-22 09:16:02,924 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [0D 43 00 00 00 06 01] 10 08 FC 00 04
+2026-05-22 09:16:03,126 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [C9 06 00 00 00 06 01] 03 08 34 00 05
+2026-05-22 09:16:03,127 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [C9 06 00 00 00 0D 01] 03 0A 20 01 21 9F 00 01 00 01 03 00
+2026-05-22 09:16:03,128 DEBUG balluff_bcm_blob_reader: ISDU response control/status=0x2001, status=2, type=1, index=8607, subindex=1, len=1, raw=[8193, 8607, 1, 1, 768]
+2026-05-22 09:16:03,129 DEBUG balluff_bcm_blob_reader: ISDU READ request index=8607, sub=2, length=1, request=[1, 8607, 2, 1], strict=True
+2026-05-22 09:16:03,131 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [9B D8 00 00 00 0F 01] 10 08 FC 00 04 08 00 01 21 9F 00 02 00 01
+2026-05-22 09:16:03,165 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [9B D8 00 00 00 06 01] 10 08 FC 00 04
+2026-05-22 09:16:03,366 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [4A 96 00 00 00 06 01] 03 08 34 00 05
+2026-05-22 09:16:03,370 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [4A 96 00 00 00 0D 01] 03 0A 20 01 21 9F 00 02 00 01 03 00
+2026-05-22 09:16:03,371 DEBUG balluff_bcm_blob_reader: ISDU response control/status=0x2001, status=2, type=1, index=8607, subindex=2, len=1, raw=[8193, 8607, 2, 1, 768]
+2026-05-22 09:16:03,372 DEBUG balluff_bcm_blob_reader: ISDU READ request index=8607, sub=3, length=1, request=[1, 8607, 3, 1], strict=True
+2026-05-22 09:16:03,374 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [D1 2B 00 00 00 0F 01] 10 08 FC 00 04 08 00 01 21 9F 00 03 00 01
+2026-05-22 09:16:03,406 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [D1 2B 00 00 00 06 01] 10 08 FC 00 04
+2026-05-22 09:16:03,608 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [D2 65 00 00 00 06 01] 03 08 34 00 05
+2026-05-22 09:16:03,610 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [D2 65 00 00 00 0D 01] 03 0A 20 01 21 9F 00 03 00 01 03 00
+2026-05-22 09:16:03,610 DEBUG balluff_bcm_blob_reader: ISDU response control/status=0x2001, status=2, type=1, index=8607, subindex=3, len=1, raw=[8193, 8607, 3, 1, 768]
+2026-05-22 09:16:03,611 DEBUG balluff_bcm_blob_reader: ISDU READ request index=8608, sub=1, length=2, request=[1, 8608, 1, 2], strict=True
+2026-05-22 09:16:03,611 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [AE 24 00 00 00 0F 01] 10 08 FC 00 04 08 00 01 21 A0 00 01 00 02
+2026-05-22 09:16:03,646 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [AE 24 00 00 00 06 01] 10 08 FC 00 04
+2026-05-22 09:16:03,847 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [50 6F 00 00 00 06 01] 03 08 34 00 05
+2026-05-22 09:16:03,851 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [50 6F 00 00 00 0D 01] 03 0A 20 01 21 A0 00 01 00 02 00 5D
+2026-05-22 09:16:03,851 DEBUG balluff_bcm_blob_reader: ISDU response control/status=0x2001, status=2, type=1, index=8608, subindex=1, len=2, raw=[8193, 8608, 1, 2, 93]
+2026-05-22 09:16:03,855 DEBUG balluff_bcm_blob_reader: ISDU WRITE request index=50, sub=0, payload=f1 f0 00, request=[2, 50, 0, 3, 61936, 0]
+2026-05-22 09:16:03,857 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [4B 39 00 00 00 13 01] 10 08 FC 00 06 0C 00 02 00 32 00 00 00 03 F1 F0 00 00
+2026-05-22 09:16:04,332 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [4B 39 00 00 00 06 01] 10 08 FC 00 06
+2026-05-22 09:16:04,534 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [05 DC 00 00 00 06 01] 03 08 34 00 15
+2026-05-22 09:16:04,537 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [05 DC 00 00 00 2D 01] 03 2A 20 02 00 32 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+2026-05-22 09:16:05,038 DEBUG balluff_bcm_blob_reader: BLOB_CH READ request index=50, sub=0, length=33, request=[1, 50, 0, 33]
+2026-05-22 09:16:05,040 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [F7 BD 00 00 00 0F 01] 10 08 FC 00 04 08 00 01 00 32 00 00 00 21
+2026-05-22 09:16:05,077 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [F7 BD 00 00 00 06 01] 10 08 FC 00 04
+2026-05-22 09:16:05,278 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [C7 6F 00 00 00 06 01] 03 08 34 00 15
+2026-05-22 09:16:05,280 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [C7 6F 00 00 00 2D 01] 03 2A 20 01 00 32 00 00 00 05 10 00 04 1C 87 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+2026-05-22 09:16:05,281 DEBUG balluff_bcm_blob_reader: BLOB_CH candidate response: control/status=0x2001, status=2, type=1, index=50, subindex=0, len=5, raw=[8193, 50, 0, 5, 4096, 1052, 34560, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+2026-05-22 09:16:05,281 DEBUG balluff_bcm_blob_reader: BLOB_CH header=0x10, function=0x1, subfunction=0x0, body_len=4
+2026-05-22 09:16:05,281 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [46 28 00 00 00 06 01] 03 08 34 00 15
+2026-05-22 09:16:05,284 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [46 28 00 00 00 2D 01] 03 2A 20 01 00 32 00 00 00 05 10 00 04 1C 87 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+2026-05-22 09:16:05,785 DEBUG balluff_bcm_blob_reader: BLOB_CH READ request index=50, sub=0, length=33, request=[1, 50, 0, 33]
+2026-05-22 09:16:05,787 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [FF 2E 00 00 00 0F 01] 10 08 FC 00 04 08 00 01 00 32 00 00 00 21
+2026-05-22 09:16:05,850 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [FF 2E 00 00 00 06 01] 10 08 FC 00 04
+2026-05-22 09:16:06,051 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [9B FD 00 00 00 06 01] 03 08 34 00 15
+2026-05-22 09:16:06,053 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [9B FD 00 00 00 2D 01] 03 2A 20 01 00 32 00 00 00 21 20 00 00 1B 82 02 00 0A 3D 18 05 71 02 A1 02 B7 02 9D 02 8E 02 C8 02 78 02 B7 02 83 02 C9 02 9D 02 00
+2026-05-22 09:16:06,054 DEBUG balluff_bcm_blob_reader: BLOB_CH candidate response: control/status=0x2001, status=2, type=1, index=50, subindex=0, len=33, raw=[8193, 50, 0, 33, 8192, 27, 33282, 10, 15640, 1393, 673, 695, 669, 654, 712, 632, 695, 643, 713, 669, 512]
+2026-05-22 09:16:06,054 DEBUG balluff_bcm_blob_reader: BLOB_CH header=0x20, function=0x2, subfunction=0x0, body_len=32
+2026-05-22 09:16:06,555 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [9A 5A 00 00 00 06 01] 03 08 34 00 15
+2026-05-22 09:16:06,558 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [9A 5A 00 00 00 2D 01] 03 2A 20 01 00 32 00 00 00 21 20 00 00 1B 82 02 00 0A 3D 18 05 71 02 A1 02 B7 02 9D 02 8E 02 C8 02 78 02 B7 02 83 02 C9 02 9D 02 00
+2026-05-22 09:16:07,059 DEBUG balluff_bcm_blob_reader: BLOB_CH READ request index=50, sub=0, length=33, request=[1, 50, 0, 33]
+2026-05-22 09:16:07,060 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [62 81 00 00 00 0F 01] 10 08 FC 00 04 08 00 01 00 32 00 00 00 21
+2026-05-22 09:16:07,129 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [62 81 00 00 00 06 01] 10 08 FC 00 04
+2026-05-22 09:16:07,329 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [70 F5 00 00 00 06 01] 03 08 34 00 15
+2026-05-22 09:16:07,330 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [70 F5 00 00 00 2D 01] 03 2A 20 01 00 32 00 00 00 21 21 02 AB 02 C2 02 83 02 A3 02 A8 02 A2 02 A0 02 CB 02 AC 02 8E 02 B4 02 95 02 C2 02 9C 02 BE 02 AE 00
+2026-05-22 09:16:07,331 DEBUG balluff_bcm_blob_reader: BLOB_CH candidate response: control/status=0x2001, status=2, type=1, index=50, subindex=0, len=33, raw=[8193, 50, 0, 33, 8450, 43778, 49666, 33538, 41730, 43010, 41474, 40962, 51970, 44034, 36354, 46082, 38146, 49666, 39938, 48642, 44544]
+2026-05-22 09:16:07,331 DEBUG balluff_bcm_blob_reader: BLOB_CH header=0x21, function=0x2, subfunction=0x1, body_len=32
+2026-05-22 09:16:07,832 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [7A 91 00 00 00 06 01] 03 08 34 00 15
+2026-05-22 09:16:07,835 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [7A 91 00 00 00 2D 01] 03 2A 20 01 00 32 00 00 00 21 21 02 AB 02 C2 02 83 02 A3 02 A8 02 A2 02 A0 02 CB 02 AC 02 8E 02 B4 02 95 02 C2 02 9C 02 BE 02 AE 00
+2026-05-22 09:16:08,336 DEBUG balluff_bcm_blob_reader: BLOB_CH READ request index=50, sub=0, length=33, request=[1, 50, 0, 33]
+2026-05-22 09:16:08,338 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [6C 23 00 00 00 0F 01] 10 08 FC 00 04 08 00 01 00 32 00 00 00 21
+2026-05-22 09:16:08,398 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [6C 23 00 00 00 06 01] 10 08 FC 00 04
+2026-05-22 09:16:08,600 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [B4 E5 00 00 00 06 01] 03 08 34 00 15
+2026-05-22 09:16:08,604 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [B4 E5 00 00 00 2D 01] 03 2A 20 01 00 32 00 00 00 21 22 B6 02 8C 02 8C 02 B4 02 8B 02 A7 02 7B 02 A7 02 98 02 CA 02 88 02 BA 02 92 02 92 02 97 02 A0 02 00
+2026-05-22 09:16:08,606 DEBUG balluff_bcm_blob_reader: BLOB_CH candidate response: control/status=0x2001, status=2, type=1, index=50, subindex=0, len=33, raw=[8193, 50, 0, 33, 8886, 652, 652, 692, 651, 679, 635, 679, 664, 714, 648, 698, 658, 658, 663, 672, 512]
+2026-05-22 09:16:08,607 DEBUG balluff_bcm_blob_reader: BLOB_CH header=0x22, function=0x2, subfunction=0x2, body_len=32
+2026-05-22 09:16:09,109 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [92 71 00 00 00 06 01] 03 08 34 00 15
+2026-05-22 09:16:09,113 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [92 71 00 00 00 2D 01] 03 2A 20 01 00 32 00 00 00 21 22 B6 02 8C 02 8C 02 B4 02 8B 02 A7 02 7B 02 A7 02 98 02 CA 02 88 02 BA 02 92 02 92 02 97 02 A0 02 00
+2026-05-22 09:16:09,614 DEBUG balluff_bcm_blob_reader: BLOB_CH READ request index=50, sub=0, length=33, request=[1, 50, 0, 33]
+2026-05-22 09:16:09,615 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [DE 2A 00 00 00 0F 01] 10 08 FC 00 04 08 00 01 00 32 00 00 00 21
+2026-05-22 09:16:09,677 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [DE 2A 00 00 00 06 01] 10 08 FC 00 04
+2026-05-22 09:16:09,878 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [E3 C3 00 00 00 06 01] 03 08 34 00 15
+2026-05-22 09:16:09,879 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [E3 C3 00 00 00 2D 01] 03 2A 20 01 00 32 00 00 00 21 23 02 A8 02 A8 02 CB 02 48 02 CD 02 89 02 AD 02 AE 02 B9 02 A4 02 9B 02 C0 02 83 02 B5 02 A6 02 74 00
+2026-05-22 09:16:09,880 DEBUG balluff_bcm_blob_reader: BLOB_CH candidate response: control/status=0x2001, status=2, type=1, index=50, subindex=0, len=33, raw=[8193, 50, 0, 33, 8962, 43010, 43010, 51970, 18434, 52482, 35074, 44290, 44546, 47362, 41986, 39682, 49154, 33538, 46338, 42498, 29696]
+2026-05-22 09:16:09,881 DEBUG balluff_bcm_blob_reader: BLOB_CH header=0x23, function=0x2, subfunction=0x3, body_len=32
+2026-05-22 09:16:10,381 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [CB 82 00 00 00 06 01] 03 08 34 00 15
+2026-05-22 09:16:10,384 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [CB 82 00 00 00 2D 01] 03 2A 20 01 00 32 00 00 00 21 23 02 A8 02 A8 02 CB 02 48 02 CD 02 89 02 AD 02 AE 02 B9 02 A4 02 9B 02 C0 02 83 02 B5 02 A6 02 74 00
+2026-05-22 09:16:10,886 DEBUG balluff_bcm_blob_reader: BLOB_CH READ request index=50, sub=0, length=33, request=[1, 50, 0, 33]
+2026-05-22 09:16:10,886 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [09 A4 00 00 00 0F 01] 10 08 FC 00 04 08 00 01 00 32 00 00 00 21
+2026-05-22 09:16:10,946 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [09 A4 00 00 00 06 01] 10 08 FC 00 04
+2026-05-22 09:16:11,148 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [D3 64 00 00 00 06 01] 03 08 34 00 15
+2026-05-22 09:16:11,151 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [D3 64 00 00 00 2D 01] 03 2A 20 01 00 32 00 00 00 21 24 C7 02 AB 02 AA 02 AB 02 96 02 A9 02 AA 02 A0 02 DE 02 7F 02 B9 02 A0 02 BE 02 AF 02 CB 02 A7 02 00
+2026-05-22 09:16:11,152 DEBUG balluff_bcm_blob_reader: BLOB_CH candidate response: control/status=0x2001, status=2, type=1, index=50, subindex=0, len=33, raw=[8193, 50, 0, 33, 9415, 683, 682, 683, 662, 681, 682, 672, 734, 639, 697, 672, 702, 687, 715, 679, 512]
+2026-05-22 09:16:11,152 DEBUG balluff_bcm_blob_reader: BLOB_CH header=0x24, function=0x2, subfunction=0x4, body_len=32
+2026-05-22 09:16:11,653 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [2B EF 00 00 00 06 01] 03 08 34 00 15
+2026-05-22 09:16:11,657 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [2B EF 00 00 00 2D 01] 03 2A 20 01 00 32 00 00 00 21 24 C7 02 AB 02 AA 02 AB 02 96 02 A9 02 AA 02 A0 02 DE 02 7F 02 B9 02 A0 02 BE 02 AF 02 CB 02 A7 02 00
+2026-05-22 09:16:12,158 DEBUG balluff_bcm_blob_reader: BLOB_CH READ request index=50, sub=0, length=33, request=[1, 50, 0, 33]
+2026-05-22 09:16:12,159 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [C5 CD 00 00 00 0F 01] 10 08 FC 00 04 08 00 01 00 32 00 00 00 21
+2026-05-22 09:16:12,220 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [C5 CD 00 00 00 06 01] 10 08 FC 00 04
+2026-05-22 09:16:12,421 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [F6 78 00 00 00 06 01] 03 08 34 00 15
+2026-05-22 09:16:12,422 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [F6 78 00 00 00 2D 01] 03 2A 20 01 00 32 00 00 00 21 25 02 CA 02 9D 02 C6 02 97 02 C2 02 9B 02 89 02 9F 02 96 02 C7 02 7C 02 B2 02 BD 02 9C 02 BC 02 AB 00
+2026-05-22 09:16:12,423 DEBUG balluff_bcm_blob_reader: BLOB_CH candidate response: control/status=0x2001, status=2, type=1, index=50, subindex=0, len=33, raw=[8193, 50, 0, 33, 9474, 51714, 40194, 50690, 38658, 49666, 39682, 35074, 40706, 38402, 50946, 31746, 45570, 48386, 39938, 48130, 43776]
+2026-05-22 09:16:12,423 DEBUG balluff_bcm_blob_reader: BLOB_CH header=0x25, function=0x2, subfunction=0x5, body_len=32
+2026-05-22 09:16:12,923 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [72 D3 00 00 00 06 01] 03 08 34 00 15
+2026-05-22 09:16:12,925 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [72 D3 00 00 00 2D 01] 03 2A 20 01 00 32 00 00 00 21 25 02 CA 02 9D 02 C6 02 97 02 C2 02 9B 02 89 02 9F 02 96 02 C7 02 7C 02 B2 02 BD 02 9C 02 BC 02 AB 00
+2026-05-22 09:16:13,427 DEBUG balluff_bcm_blob_reader: BLOB_CH READ request index=50, sub=0, length=33, request=[1, 50, 0, 33]
+2026-05-22 09:16:13,427 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [DD 03 00 00 00 0F 01] 10 08 FC 00 04 08 00 01 00 32 00 00 00 21
+2026-05-22 09:16:13,489 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [DD 03 00 00 00 06 01] 10 08 FC 00 04
+2026-05-22 09:16:13,690 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [0F B6 00 00 00 06 01] 03 08 34 00 15
+2026-05-22 09:16:13,692 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [0F B6 00 00 00 2D 01] 03 2A 20 01 00 32 00 00 00 21 26 72 02 D7 02 BD 02 86 02 B9 02 AE 02 B7 02 97 02 A2 02 85 02 BE 02 8F 02 8F 02 C5 02 91 02 B3 02 00
+2026-05-22 09:16:13,692 DEBUG balluff_bcm_blob_reader: BLOB_CH candidate response: control/status=0x2001, status=2, type=1, index=50, subindex=0, len=33, raw=[8193, 50, 0, 33, 9842, 727, 701, 646, 697, 686, 695, 663, 674, 645, 702, 655, 655, 709, 657, 691, 512]
+2026-05-22 09:16:13,692 DEBUG balluff_bcm_blob_reader: BLOB_CH header=0x26, function=0x2, subfunction=0x6, body_len=32
+2026-05-22 09:16:14,194 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [2D 60 00 00 00 06 01] 03 08 34 00 15
+2026-05-22 09:16:14,196 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [2D 60 00 00 00 2D 01] 03 2A 20 01 00 32 00 00 00 21 26 72 02 D7 02 BD 02 86 02 B9 02 AE 02 B7 02 97 02 A2 02 85 02 BE 02 8F 02 8F 02 C5 02 91 02 B3 02 00
+2026-05-22 09:16:14,697 DEBUG balluff_bcm_blob_reader: BLOB_CH READ request index=50, sub=0, length=33, request=[1, 50, 0, 33]
+2026-05-22 09:16:14,700 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [0C FB 00 00 00 0F 01] 10 08 FC 00 04 08 00 01 00 32 00 00 00 21
+2026-05-22 09:16:14,769 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [0C FB 00 00 00 06 01] 10 08 FC 00 04
+2026-05-22 09:16:14,970 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [C9 69 00 00 00 06 01] 03 08 34 00 15
+2026-05-22 09:16:14,975 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [C9 69 00 00 00 2D 01] 03 2A 20 01 00 32 00 00 00 21 27 02 A0 02 B1 02 9D 02 A2 02 A2 02 D4 02 A4 02 C0 02 9B 02 AA 02 C0 02 B9 02 A7 02 98 02 AA 02 78 00
+2026-05-22 09:16:14,976 DEBUG balluff_bcm_blob_reader: BLOB_CH candidate response: control/status=0x2001, status=2, type=1, index=50, subindex=0, len=33, raw=[8193, 50, 0, 33, 9986, 40962, 45314, 40194, 41474, 41474, 54274, 41986, 49154, 39682, 43522, 49154, 47362, 42754, 38914, 43522, 30720]
+2026-05-22 09:16:14,977 DEBUG balluff_bcm_blob_reader: BLOB_CH header=0x27, function=0x2, subfunction=0x7, body_len=32
+2026-05-22 09:16:15,479 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [7A 98 00 00 00 06 01] 03 08 34 00 15
+2026-05-22 09:16:15,483 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [7A 98 00 00 00 2D 01] 03 2A 20 01 00 32 00 00 00 21 27 02 A0 02 B1 02 9D 02 A2 02 A2 02 D4 02 A4 02 C0 02 9B 02 AA 02 C0 02 B9 02 A7 02 98 02 AA 02 78 00
+2026-05-22 09:16:15,985 DEBUG balluff_bcm_blob_reader: BLOB_CH READ request index=50, sub=0, length=33, request=[1, 50, 0, 33]
+2026-05-22 09:16:15,985 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [BE 34 00 00 00 0F 01] 10 08 FC 00 04 08 00 01 00 32 00 00 00 21
+2026-05-22 09:16:16,047 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [BE 34 00 00 00 06 01] 10 08 FC 00 04
+2026-05-22 09:16:16,253 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [B2 79 00 00 00 06 01] 03 08 34 00 15
+2026-05-22 09:16:16,257 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [B2 79 00 00 00 2D 01] 03 2A 20 01 00 32 00 00 00 21 28 AD 02 A6 02 A9 02 B5 02 AA 02 A4 02 90 02 C5 02 9A 02 C1 02 8D 02 AD 02 A0 02 D5 02 A2 02 9F 02 00
+2026-05-22 09:16:16,257 DEBUG balluff_bcm_blob_reader: BLOB_CH candidate response: control/status=0x2001, status=2, type=1, index=50, subindex=0, len=33, raw=[8193, 50, 0, 33, 10413, 678, 681, 693, 682, 676, 656, 709, 666, 705, 653, 685, 672, 725, 674, 671, 512]
+2026-05-22 09:16:16,258 DEBUG balluff_bcm_blob_reader: BLOB_CH header=0x28, function=0x2, subfunction=0x8, body_len=32
+2026-05-22 09:16:16,759 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [BF 6D 00 00 00 06 01] 03 08 34 00 15
+2026-05-22 09:16:16,763 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [BF 6D 00 00 00 2D 01] 03 2A 20 01 00 32 00 00 00 21 28 AD 02 A6 02 A9 02 B5 02 AA 02 A4 02 90 02 C5 02 9A 02 C1 02 8D 02 AD 02 A0 02 D5 02 A2 02 9F 02 00
+2026-05-22 09:16:17,264 DEBUG balluff_bcm_blob_reader: BLOB_CH READ request index=50, sub=0, length=33, request=[1, 50, 0, 33]
+2026-05-22 09:16:17,264 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [09 1B 00 00 00 0F 01] 10 08 FC 00 04 08 00 01 00 32 00 00 00 21
+2026-05-22 09:16:17,326 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [09 1B 00 00 00 06 01] 10 08 FC 00 04
+2026-05-22 09:16:17,527 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [5E 1D 00 00 00 06 01] 03 08 34 00 15
+2026-05-22 09:16:17,528 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [5E 1D 00 00 00 2D 01] 03 2A 20 01 00 32 00 00 00 21 29 02 93 02 86 02 A4 02 A7 02 B3 02 97 02 99 02 B2 02 AC 02 97 02 CA 02 88 02 74 02 A0 02 AC 02 79 00
+2026-05-22 09:16:17,528 DEBUG balluff_bcm_blob_reader: BLOB_CH candidate response: control/status=0x2001, status=2, type=1, index=50, subindex=0, len=33, raw=[8193, 50, 0, 33, 10498, 37634, 34306, 41986, 42754, 45826, 38658, 39170, 45570, 44034, 38658, 51714, 34818, 29698, 40962, 44034, 30976]
+2026-05-22 09:16:17,528 DEBUG balluff_bcm_blob_reader: BLOB_CH header=0x29, function=0x2, subfunction=0x9, body_len=32
+2026-05-22 09:16:18,031 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [9E BB 00 00 00 06 01] 03 08 34 00 15
+2026-05-22 09:16:18,032 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [9E BB 00 00 00 2D 01] 03 2A 20 01 00 32 00 00 00 21 29 02 93 02 86 02 A4 02 A7 02 B3 02 97 02 99 02 B2 02 AC 02 97 02 CA 02 88 02 74 02 A0 02 AC 02 79 00
+2026-05-22 09:16:18,534 DEBUG balluff_bcm_blob_reader: BLOB_CH READ request index=50, sub=0, length=33, request=[1, 50, 0, 33]
+2026-05-22 09:16:18,535 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [FF F9 00 00 00 0F 01] 10 08 FC 00 04 08 00 01 00 32 00 00 00 21
+2026-05-22 09:16:18,600 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [FF F9 00 00 00 06 01] 10 08 FC 00 04
+2026-05-22 09:16:18,801 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [33 DE 00 00 00 06 01] 03 08 34 00 15
+2026-05-22 09:16:18,805 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [33 DE 00 00 00 2D 01] 03 2A 20 01 00 32 00 00 00 21 2A BA 02 7E 02 B1 02 9F 02 AB 02 B1 02 8D 02 96 02 89 02 C4 02 AD 02 98 02 97 02 BE 02 D2 02 A6 02 00
+2026-05-22 09:16:18,806 DEBUG balluff_bcm_blob_reader: BLOB_CH candidate response: control/status=0x2001, status=2, type=1, index=50, subindex=0, len=33, raw=[8193, 50, 0, 33, 10938, 638, 689, 671, 683, 689, 653, 662, 649, 708, 685, 664, 663, 702, 722, 678, 512]
+2026-05-22 09:16:18,806 DEBUG balluff_bcm_blob_reader: BLOB_CH header=0x2A, function=0x2, subfunction=0xA, body_len=32
+2026-05-22 09:16:19,309 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [78 68 00 00 00 06 01] 03 08 34 00 15
+2026-05-22 09:16:19,312 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [78 68 00 00 00 2D 01] 03 2A 20 01 00 32 00 00 00 21 2A BA 02 7E 02 B1 02 9F 02 AB 02 B1 02 8D 02 96 02 89 02 C4 02 AD 02 98 02 97 02 BE 02 D2 02 A6 02 00
+2026-05-22 09:16:19,814 DEBUG balluff_bcm_blob_reader: BLOB_CH READ request index=50, sub=0, length=33, request=[1, 50, 0, 33]
+2026-05-22 09:16:19,816 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [DA D6 00 00 00 0F 01] 10 08 FC 00 04 08 00 01 00 32 00 00 00 21
+2026-05-22 09:16:19,880 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [DA D6 00 00 00 06 01] 10 08 FC 00 04
+2026-05-22 09:16:20,081 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [09 12 00 00 00 06 01] 03 08 34 00 15
+2026-05-22 09:16:20,083 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [09 12 00 00 00 2D 01] 03 2A 20 01 00 32 00 00 00 21 2B 02 C1 02 89 02 C9 02 B5 02 A1 02 9E 02 D6 02 D3 02 AD 02 9E 02 E4 02 B7 02 87 02 81 02 A6 02 BC 00
+2026-05-22 09:16:20,084 DEBUG balluff_bcm_blob_reader: BLOB_CH candidate response: control/status=0x2001, status=2, type=1, index=50, subindex=0, len=33, raw=[8193, 50, 0, 33, 11010, 49410, 35074, 51458, 46338, 41218, 40450, 54786, 54018, 44290, 40450, 58370, 46850, 34562, 33026, 42498, 48128]
+2026-05-22 09:16:20,085 DEBUG balluff_bcm_blob_reader: BLOB_CH header=0x2B, function=0x2, subfunction=0xB, body_len=32
+2026-05-22 09:16:20,588 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [2F 2A 00 00 00 06 01] 03 08 34 00 15
+2026-05-22 09:16:20,591 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [2F 2A 00 00 00 2D 01] 03 2A 20 01 00 32 00 00 00 21 2B 02 C1 02 89 02 C9 02 B5 02 A1 02 9E 02 D6 02 D3 02 AD 02 9E 02 E4 02 B7 02 87 02 81 02 A6 02 BC 00
+2026-05-22 09:16:21,092 DEBUG balluff_bcm_blob_reader: BLOB_CH READ request index=50, sub=0, length=33, request=[1, 50, 0, 33]
+2026-05-22 09:16:21,093 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [0E 5D 00 00 00 0F 01] 10 08 FC 00 04 08 00 01 00 32 00 00 00 21
+2026-05-22 09:16:21,158 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [0E 5D 00 00 00 06 01] 10 08 FC 00 04
+2026-05-22 09:16:21,361 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [8C 96 00 00 00 06 01] 03 08 34 00 15
+2026-05-22 09:16:21,363 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [8C 96 00 00 00 2D 01] 03 2A 20 01 00 32 00 00 00 21 2C BC 02 B4 02 84 02 C6 02 9E 02 AF 02 D6 02 B1 02 A9 02 97 02 9A 02 8C 02 BF 02 96 02 9D 02 BC 02 00
+2026-05-22 09:16:21,364 DEBUG balluff_bcm_blob_reader: BLOB_CH candidate response: control/status=0x2001, status=2, type=1, index=50, subindex=0, len=33, raw=[8193, 50, 0, 33, 11452, 692, 644, 710, 670, 687, 726, 689, 681, 663, 666, 652, 703, 662, 669, 700, 512]
+2026-05-22 09:16:21,365 DEBUG balluff_bcm_blob_reader: BLOB_CH header=0x2C, function=0x2, subfunction=0xC, body_len=32
+2026-05-22 09:16:21,866 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [60 D5 00 00 00 06 01] 03 08 34 00 15
+2026-05-22 09:16:21,869 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [60 D5 00 00 00 2D 01] 03 2A 20 01 00 32 00 00 00 21 2C BC 02 B4 02 84 02 C6 02 9E 02 AF 02 D6 02 B1 02 A9 02 97 02 9A 02 8C 02 BF 02 96 02 9D 02 BC 02 00
+2026-05-22 09:16:22,371 DEBUG balluff_bcm_blob_reader: BLOB_CH READ request index=50, sub=0, length=33, request=[1, 50, 0, 33]
+2026-05-22 09:16:22,372 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [18 E4 00 00 00 0F 01] 10 08 FC 00 04 08 00 01 00 32 00 00 00 21
+2026-05-22 09:16:22,437 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [18 E4 00 00 00 06 01] 10 08 FC 00 04
+2026-05-22 09:16:22,638 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [AE E7 00 00 00 06 01] 03 08 34 00 15
+2026-05-22 09:16:22,642 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [AE E7 00 00 00 2D 01] 03 2A 20 01 00 32 00 00 00 21 2D 02 AD 02 AA 02 C8 02 C7 02 A1 02 89 02 C1 02 A6 02 AF 02 C9 02 87 02 BD 02 B2 02 9A 02 D2 02 7E 00
+2026-05-22 09:16:22,643 DEBUG balluff_bcm_blob_reader: BLOB_CH candidate response: control/status=0x2001, status=2, type=1, index=50, subindex=0, len=33, raw=[8193, 50, 0, 33, 11522, 44290, 43522, 51202, 50946, 41218, 35074, 49410, 42498, 44802, 51458, 34562, 48386, 45570, 39426, 53762, 32256]
+2026-05-22 09:16:22,644 DEBUG balluff_bcm_blob_reader: BLOB_CH header=0x2D, function=0x2, subfunction=0xD, body_len=32
+2026-05-22 09:16:23,147 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [BB C5 00 00 00 06 01] 03 08 34 00 15
+2026-05-22 09:16:23,149 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [BB C5 00 00 00 2D 01] 03 2A 20 01 00 32 00 00 00 21 2D 02 AD 02 AA 02 C8 02 C7 02 A1 02 89 02 C1 02 A6 02 AF 02 C9 02 87 02 BD 02 B2 02 9A 02 D2 02 7E 00
+2026-05-22 09:16:23,651 DEBUG balluff_bcm_blob_reader: BLOB_CH READ request index=50, sub=0, length=33, request=[1, 50, 0, 33]
+2026-05-22 09:16:23,651 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [45 F5 00 00 00 0F 01] 10 08 FC 00 04 08 00 01 00 32 00 00 00 21
+2026-05-22 09:16:23,723 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [45 F5 00 00 00 06 01] 10 08 FC 00 04
+2026-05-22 09:16:23,924 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [59 19 00 00 00 06 01] 03 08 34 00 15
+2026-05-22 09:16:23,929 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [59 19 00 00 00 2D 01] 03 2A 30 01 00 32 00 00 00 21 2D 02 AD 02 AA 02 C8 02 C7 02 A1 02 89 02 C1 02 A6 02 AF 02 C9 02 87 02 BD 02 B2 02 9A 02 D2 02 7E 00
+2026-05-22 09:16:23,930 DEBUG balluff_bcm_blob_reader: BLOB_CH read request failed while mailbox payload stayed unchanged; status=3, control_word=0x3001; attempt=1/1; will retry the BLOB_CH read request if retries remain
+2026-05-22 09:16:23,931 DEBUG balluff_bcm_blob_reader: ISDU WRITE request index=50, sub=0, payload=f0, request=[2, 50, 0, 1, 61440]
+2026-05-22 09:16:23,933 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Tx [AF 47 00 00 00 11 01] 10 08 FC 00 05 0A 00 02 00 32 00 00 00 01 F0 00
+2026-05-22 09:16:23,937 DEBUG pyModbusTCP.client: (192.168.137.21:502:1) Rx [AF 47 00 00 00 06 01] 10 08 FC 00 05
