@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """
-balluff_bcm_blob_reader.py
+ICE2_modbus_balluff_bcm_blob_reader.py
 
 Read raw acceleration BLOBs from a Balluff BCM R16E-004-CI02/BCM0003
 through a Pepperl+Fuchs ICE2/ICE3 IO-Link master using Modbus/TCP.
 
-BCM fresh-response version v8 + Balluff manual-aligned raw payload parser:
+BCM fresh-response version v9 + timeout-safe pacing + Balluff manual-aligned raw payload parser:
 This keeps the working Pepperl+Fuchs VIM32PP BLOB pattern, but adds one
 important guard for BCM0003 + ICE2/ICE3 Modbus/TCP:
 - before every stateful BLOB_CH read request, snapshot the ICE ISDU response
@@ -22,7 +22,10 @@ important guard for BCM0003 + ICE2/ICE3 Modbus/TCP:
 - guard target values so this raw-acceleration script does not accidentally parse
   spectrum payloads as raw acceleration;
 - make stateful BLOB_CH retries/freshness bypasses explicitly unsafe diagnostics;
-- print the sensor's estimated raw-axis transfer time when available.
+- print the sensor's estimated raw-axis transfer time when available;
+- avoid the old double segment-gap delay that could stretch a 269 kB transfer
+  beyond the observed approximately six-minute active-transfer boundary;
+- print projected minimum transfer time and elapsed time during progress/error output.
 
 This prevents stale Modbus response images from being mistaken for duplicate
 BLOB segments. A BLOB_CH read is stateful, so the code must not recover from a
@@ -33,10 +36,10 @@ Install:
 pip install pyModbusTCP
 
 Typical run:
-python balluff_bcm_blob_reader.py
+python ICE2_modbus_balluff_bcm_blob_reader.py
 
 Useful test run:
-python balluff_bcm_blob_reader_v8_manual_aligned.py --max-isdu-len 101 --flow-policy strict --unsafe-blob-read-retries 0 --once
+python balluff_bcm_blob_reader_v9_timeout_safe.py --max-isdu-len 201 --flow-policy strict --unsafe-blob-read-retries 0 --once
 
 Default behavior:
 - sends BLOB_Finish -> BLOB_Abort -> BLOB_Finish at startup to recover from an aborted run
@@ -1223,6 +1226,17 @@ class Ice2BalluffBcmBlobReader:
                 raise BlobTransferError(f"Invalid BLOB_Info payload length: {expected_blob_len}")
             print(f"Expected BLOB payload size: {expected_blob_len} bytes")
 
+            normal_segment_body_len = max(self.max_isdu_len - 1, 1)
+            projected_segment_reads = math.ceil(expected_blob_len / normal_segment_body_len)
+            projected_delay_only_s = projected_segment_reads * (
+                self.isdu_delay_s + self.blob_segment_gap_s
+            )
+            print(
+                "Projected transfer floor from configured waits: "
+                f"~{projected_delay_only_s:.1f}s for ~{projected_segment_reads} data reads "
+                "(plus Modbus/IO-Link processing overhead)"
+            )
+
             payload = bytearray()
             local_crc = 1
             expected_flow = 0
@@ -1268,8 +1282,17 @@ class Ice2BalluffBcmBlobReader:
                             f"BLOB_Last arrived after too many bytes: {len(payload)} > {expected_blob_len}"
                         )
                     if len(body) < remaining:
+                        elapsed_s = time.monotonic() - start_time
                         raise BlobTransferError(
-                            f"BLOB_Last too short: needed {remaining} final bytes, got {len(body)}"
+                            "Premature BLOB_Last: the device ended the transfer before the "
+                            "BLOB_Info length was delivered. "
+                            f"needed={remaining} final bytes, got={len(body)}, "
+                            f"received={len(payload)}/{expected_blob_len}, "
+                            f"segments={segment_count}, elapsed={elapsed_s:.1f}s. "
+                            "This is not normal final-packet padding. On this ICE2/BCM path, "
+                            "check whether the transfer duration is approaching a device/master "
+                            "session limit and reduce per-segment pacing without enabling unsafe "
+                            "stateful BLOB_CH retries."
                         )
 
                     last_bytes = bytes(body[:remaining])
@@ -1315,8 +1338,8 @@ class Ice2BalluffBcmBlobReader:
                                 "Try increasing BCM_BLOB_SEGMENT_GAP_S or reducing BCM_MAX_ISDU_LEN."
                             )
 
-                        if self.blob_segment_gap_s > 0:
-                            time.sleep(self.blob_segment_gap_s)
+                        # read_blob_ch_once() applies the configured quiet gap before
+                        # the next state-advancing BLOB_CH request. Do not sleep here too.
                         continue
 
                     handle_flow_anomaly(
@@ -1354,16 +1377,22 @@ class Ice2BalluffBcmBlobReader:
                 segment_count += 1
 
                 if segment_count <= 25 or segment_count % 25 == 0:
+                    elapsed_s = time.monotonic() - start_time
                     print(
                         f"Segment {segment_count}: flow={subfunction}, body_len={len(body_bytes)}, "
-                        f"received={len(payload)}/{expected_blob_len}, crc=0x{local_crc:08X}"
+                        f"received={len(payload)}/{expected_blob_len}, crc=0x{local_crc:08X}, "
+                        f"elapsed={elapsed_s:.1f}s"
                     )
                 else:
                     now = time.monotonic()
                     if now - last_progress_print >= 2.0:
+                        elapsed_s = time.monotonic() - start_time
+                        rate_bps = len(payload) / elapsed_s if elapsed_s > 0 else 0.0
+                        eta_s = (expected_blob_len - len(payload)) / rate_bps if rate_bps > 0 else math.inf
                         print(
                             f"Received {len(payload)} / {expected_blob_len} bytes "
-                            f"({segment_count} BLOB_Segment reads, crc=0x{local_crc:08X})"
+                            f"({segment_count} BLOB_Segment reads, crc=0x{local_crc:08X}, "
+                            f"elapsed={elapsed_s:.1f}s, rate={rate_bps:.1f} B/s, eta={eta_s:.1f}s)"
                         )
                         last_progress_print = now
 
@@ -1375,8 +1404,10 @@ class Ice2BalluffBcmBlobReader:
                 # it lets the reader recover after a gateway-visible flow anomaly.
                 expected_flow = (subfunction + 1) & 0x0F
 
-                if self.blob_segment_gap_s > 0:
-                    time.sleep(self.blob_segment_gap_s)
+                # read_blob_ch_once() applies the configured quiet gap before
+                # the next state-advancing BLOB_CH request. The previous extra sleep
+                # here doubled the segment gap and could push large transfers beyond
+                # the active BLOB session duration.
 
             # 3) Exact length check.
             if len(payload) != expected_blob_len:
@@ -1721,12 +1752,12 @@ def parse_args(argv: Optional[List[str]] = None) -> argparse.Namespace:
     parser.add_argument("--axis-selection", type=int, default=env_int(merged_env, "BCM_AXIS_SELECTION", 6))
     parser.add_argument("--target", type=int, default=env_int(merged_env, "BCM_TARGET", 0))
 
-    parser.add_argument("--max-isdu-len", type=int, default=env_int(merged_env, "BCM_MAX_ISDU_LEN", 201))
-    parser.add_argument("--isdu-delay-s", type=float, default=env_float(merged_env, "BCM_ISDU_DELAY_S", 0.2))
+    parser.add_argument("--max-isdu-len", type=int, default=env_int(merged_env, "BCM_MAX_ISDU_LEN", 232))
+    parser.add_argument("--isdu-delay-s", type=float, default=env_float(merged_env, "BCM_ISDU_DELAY_S", 0.1))
     parser.add_argument(
         "--blob-segment-gap-s",
         type=float,
-        default=env_float(merged_env, "BCM_BLOB_SEGMENT_GAP_S", 0.05),
+        default=env_float(merged_env, "BCM_BLOB_SEGMENT_GAP_S", 0.01),
         help=(
             "Quiet time before each BLOB_CH read request. This paces Balluff BCM BLOB "
             "segments without retrying index 50 or accepting duplicate packets."
@@ -1735,7 +1766,7 @@ def parse_args(argv: Optional[List[str]] = None) -> argparse.Namespace:
     parser.add_argument(
         "--blob-response-poll-s",
         type=float,
-        default=env_float(merged_env, "BCM_BLOB_RESPONSE_POLL_S", 0.02),
+        default=env_float(merged_env, "BCM_BLOB_RESPONSE_POLL_S", 0.01),
         help="Polling interval for re-reading the ICE ISDU response mailbox while waiting for a fresh BLOB_CH response.",
     )
     parser.add_argument(
@@ -1889,6 +1920,22 @@ def main(argv: Optional[List[str]] = None) -> int:
     print(f"Max duplicate re-reads: {args.max_duplicate_rereads}")
     print(f"Flow-counter policy: {args.flow_policy}")
     print(f"Modbus retries: {args.modbus_retries} x {args.modbus_retry_delay_s:.3f}s")
+
+    typical_blob_len = 269_515
+    typical_body_len = max(args.max_isdu_len - 1, 1)
+    typical_reads = math.ceil(typical_blob_len / typical_body_len)
+    typical_wait_floor_s = typical_reads * (args.isdu_delay_s + args.blob_segment_gap_s)
+    print(
+        f"Typical 269515-byte BLOB configured-wait floor: ~{typical_wait_floor_s:.1f}s "
+        f"for ~{typical_reads} reads (transport overhead not included)"
+    )
+    if typical_wait_floor_s >= 330.0:
+        print(
+            "WARNING: configured waits alone approach six minutes. A large BCM raw BLOB may "
+            "terminate before completion. Reduce BCM_ISDU_DELAY_S and/or "
+            "BCM_BLOB_SEGMENT_GAP_S; do not enable unsafe BLOB_CH retries.",
+            file=sys.stderr,
+        )
 
     reader = Ice2BalluffBcmBlobReader(
         host=args.host,
